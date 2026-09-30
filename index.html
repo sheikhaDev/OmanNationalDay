@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>اكتشف عمان 🇴🇲</title>
+    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
         body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
@@ -133,9 +133,10 @@
     let bgLoaded = false;
     bgImg.onload = () => { bgLoaded = true; };
 
+    // بنك الأسئلة مع تحديد 20 نوفمبر كإجابة صحيحة لسؤال اليوم الوطني
     const allQuestions = [
         { q: "ما عاصمة سلطنة عُمان؟", options: ["صلالة", "مسقط", "صحار", "نزوى"], answer: 1 },
-        { q: "متى تحتفل سلطنة عُمان باليوم الوطني؟", options: ["18 نوفمبر", "20 نوفمبر", "23 يوليو", "11 يناير"], answer: 0 },
+        { q: "متى تحتفل سلطنة عُمان باليوم الوطني؟", options: ["18 نوفمبر", "20 نوفمبر", "23 يوليو", "11 يناير"], answer: 1 },
         { q: "ما العملة الرسمية في سلطنة عُمان؟", options: ["الدرهم", "الدينار", "الريال العُماني", "الريال السعودي"], answer: 2 },
         { q: "ما ألوان علم سلطنة عُمان؟", options: ["الأحمر والأبيض والأخضر", "الأزرق والأبيض", "الأصفر والأخضر", "الأسود والأحمر"], answer: 0 },
         { q: "في أي محافظة تقع مدينة صلالة؟", options: ["مسقط", "ظفار", "الداخلية", "شمال الباطنة"], answer: 1 },
@@ -163,6 +164,15 @@
         { x: 1550, y: 320, w: 140, h: 20 },
         { x: 1850, y: 270, w: 150, h: 20 },
         { x: 2200, y: 320, w: 160, h: 20 }
+    ];
+
+    // أحجار في الأرضية ليضطر اللاعب للقفز فوقها
+    const stones = [
+        { x: 450, y: 380, w: 40, h: 40 },
+        { x: 800, y: 375, w: 45, h: 45 },
+        { x: 1350, y: 380, w: 40, h: 40 },
+        { x: 1750, y: 370, w: 50, h: 50 },
+        { x: 2350, y: 380, w: 40, h: 40 }
     ];
 
     let flagsList = [
@@ -265,10 +275,33 @@
         if (player.x < 10) player.x = 10;
 
         player.grounded = false;
+        
+        // التحقق من الاصطدام بالمنصات العلوية
         platforms.forEach(plat => {
             if (player.x < plat.x + plat.w && player.x + player.width > plat.x &&
                 player.y + player.height >= plat.y && player.y + player.height <= plat.y + plat.h + player.vy) {
                 if (player.vy >= 0) { player.grounded = true; player.vy = 0; player.y = plat.y - player.height; }
+            }
+        });
+
+        // التحقق من الاصطدام بالأحجار الأرضية (القفز فوقها أو الاصطدام الجانبي)
+        stones.forEach(stone => {
+            // الهبوط فوق الحجر
+            if (player.x < stone.x + stone.w && player.x + player.width > stone.x &&
+                player.y + player.height >= stone.y && player.y + player.height <= stone.y + stone.h + player.vy) {
+                if (player.vy >= 0) {
+                    player.grounded = true;
+                    player.vy = 0;
+                    player.y = stone.y - player.height;
+                }
+            }
+            // الاصطدام بجانب الحجر أفقياً
+            if (player.y + player.height > stone.y && player.y < stone.y + stone.h) {
+                if (player.facingRight && player.x + player.width >= stone.x && player.x < stone.x) {
+                    player.x = stone.x - player.width;
+                } else if (!player.facingRight && player.x <= stone.x + stone.w && player.x + player.width > stone.x + stone.w) {
+                    player.x = stone.x + stone.w;
+                }
             }
         });
 
@@ -331,6 +364,22 @@
         platforms.forEach(p => {
             ctx.fillStyle = '#007a3d'; ctx.fillRect(p.x, p.y, p.w, p.h);
             ctx.fillStyle = '#d62828'; ctx.fillRect(p.x, p.y, p.w, 5);
+        });
+
+        // رسم الأحجار على الطريق
+        stones.forEach(stone => {
+            ctx.save();
+            ctx.fillStyle = '#7f8c8d';
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(stone.x, stone.y, stone.w, stone.h, [8, 8, 2, 2]);
+            ctx.fill();
+            ctx.stroke();
+            // تفاصيل الحجر الجمالية
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(stone.x + 8, stone.y + 8, 10, 8);
+            ctx.restore();
         });
 
         flagsList.forEach(f => {
