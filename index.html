@@ -1,1 +1,902 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🇴🇲 مغامرة العيد الوطني العُماني للأطفال 🇴🇲</title>
+    <!-- Google Fonts for friendly Arabic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Cairo', sans-serif;
+        }
 
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0d1b2a;
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1b263b, #0d1b2a);
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 1280px;
+            max-height: 720px;
+            background: #000;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 5px solid #d62612;
+            border-radius: 20px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .touch-btn {
+            touch-action: manipulation;
+            transition: transform 0.1s ease, filter 0.1s ease;
+        }
+        .touch-btn:active {
+            transform: scale(0.9);
+            filter: brightness(1.2);
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            border: 5px solid #008751;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(214, 38, 18, 0.3);
+        }
+
+        @keyframes floatBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-slow {
+            animation: floatBounce 2s infinite ease-in-out;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 14px;
+            height: 18px;
+            top: -20px;
+            z-index: 100;
+            animation: confettiFall 3s linear infinite;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <!-- Hidden Image Assets for dynamic rendering -->
+    <div style="display: none;">
+        <img id="bgAsset" src="image_6.png" alt="Oman Fort Background" />
+        <img id="playerAsset" src="image_5.png" alt="Omani Girl Character" />
+    </div>
+
+    <div id="game-wrapper" class="p-2 sm:p-4">
+        <div id="game-container">
+            <!-- Canvas where 2D game is rendered -->
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- HUD Header Overlay -->
+            <div id="hud" class="absolute top-3 left-3 right-3 flex justify-between items-center z-20 pointer-events-none">
+                <div class="flex gap-2 sm:gap-4">
+                    <!-- Flags Counter -->
+                    <div class="bg-white/95 border-3 border-[#d62612] px-4 sm:px-6 py-2 rounded-full shadow-lg flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl animate-bounce-slow">🇴🇲</span>
+                        <span class="text-xl sm:text-2xl font-black text-[#008751]">الأعلام: <span id="hud-score" class="text-[#d62612]">0</span></span>
+                    </div>
+
+                    <!-- Question Counter -->
+                    <div class="bg-white/95 border-3 border-[#008751] px-4 sm:px-6 py-2 rounded-full shadow-lg flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl">⭐</span>
+                        <span class="text-xl sm:text-2xl font-black text-[#008751]">المحطات: <span id="hud-qcount" class="text-[#d62612]">0</span> / 5</span>
+                    </div>
+                </div>
+
+                <!-- Audio Toggle Button -->
+                <button id="audio-toggle-btn" onclick="toggleAudio()" class="pointer-events-auto bg-white/95 hover:bg-yellow-100 border-3 border-yellow-500 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg flex items-center justify-center text-2xl sm:text-3xl transition-transform active:scale-95">
+                    🔊
+                </button>
+            </div>
+
+            <!-- Start Screen Overlay -->
+            <div id="start-screen" class="absolute inset-0 z-40 bg-slate-950/75 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center">
+                <div class="relative max-w-lg w-full bg-white/95 backdrop-blur-xl border-4 border-[#008751] p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center gap-5 overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-[#d62612] via-white to-[#008751]"></div>
+
+                    <!-- Character preview thumbnail -->
+                    <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-amber-100 border-4 border-amber-400 shadow-lg flex items-center justify-center overflow-hidden animate-bounce-slow p-2 mt-2">
+                        <img src="image_5.png" alt="البطلة العُمانية" class="h-full object-contain" onerror="this.style.display='none'; document.getElementById('emoji-fallback').style.display='block';">
+                        <span id="emoji-fallback" style="display:none;" class="text-6xl">👧🇴🇲</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <h1 class="text-3xl sm:text-5xl font-black text-slate-800 tracking-wide">
+                            مغامرة العيد الوطني
+                        </h1>
+                        <p class="text-xl sm:text-2xl font-black text-[#008751]">
+                            سلطنة عُمان 🇴🇲
+                        </p>
+                    </div>
+
+                    <div class="bg-emerald-50 border-2 border-emerald-200 p-3 rounded-2xl text-emerald-800 text-lg sm:text-xl font-bold">
+                        🎈 رحلة سهلة وممتعة ومجهزة خصيصاً للأطفال!
+                    </div>
+
+                    <button onclick="startGame()" class="touch-btn w-full bg-gradient-to-r from-[#d62612] to-[#ff3b25] hover:from-[#b81d0b] hover:to-[#d62612] text-white font-black text-2xl sm:text-3xl py-4 rounded-2xl shadow-xl border-2 border-amber-300 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                        <span>ابدأ اللعب الآن</span>
+                        <span class="text-4xl">🎮</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Touch Controls (Simplified & Larger for Children) -->
+            <div id="touch-controls" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none">
+                <div class="flex gap-4 pointer-events-auto">
+                    <button id="btn-left" class="touch-btn w-20 h-20 sm:w-24 sm:h-24 bg-white/95 border-4 border-[#d62612] rounded-3xl shadow-2xl flex items-center justify-center text-4xl sm:text-5xl active:bg-red-100">
+                        ⬅️
+                    </button>
+                    <button id="btn-right" class="touch-btn w-20 h-20 sm:w-24 sm:h-24 bg-white/95 border-4 border-[#d62612] rounded-3xl shadow-2xl flex items-center justify-center text-4xl sm:text-5xl active:bg-red-100">
+                        ➡️
+                    </button>
+                </div>
+
+                <div class="pointer-events-auto">
+                    <button id="btn-jump" class="touch-btn w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-t from-amber-400 to-yellow-300 border-4 border-[#008751] rounded-full shadow-2xl flex items-center justify-center text-5xl sm:text-6xl active:bg-yellow-400">
+                        🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Modal Overlay -->
+            <div id="question-modal" class="hidden absolute inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+                <div class="modal-card max-w-lg w-full p-6 sm:p-8 rounded-3xl text-center relative border-4 border-[#008751]">
+                    <div class="inline-block bg-[#008751] text-white px-5 py-1.5 rounded-full font-black text-lg sm:text-xl mb-4 shadow">
+                        🌟 محطة معرفة جديدة 🌟
+                    </div>
+                    <h2 id="q-text" class="text-2xl sm:text-3xl font-black text-slate-800 mb-6 leading-relaxed">
+                        ما اسم بلدنا؟
+                    </h2>
+
+                    <div id="q-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"></div>
+
+                    <div id="q-feedback" class="h-12 text-2xl sm:text-3xl font-black flex items-center justify-center"></div>
+                </div>
+            </div>
+
+            <!-- Victory Modal Overlay -->
+            <div id="victory-modal" class="hidden absolute inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+                <div class="modal-card max-w-lg w-full p-6 sm:p-8 rounded-3xl text-center flex flex-col items-center gap-4 border-4 border-[#d62612]">
+                    <div class="text-6xl sm:text-8xl animate-bounce">🏆</div>
+                    <h1 class="text-3xl sm:text-5xl font-black text-[#d62612]">بطل اليوم! 🎉</h1>
+                    <p class="text-xl sm:text-2xl font-black text-[#008751] leading-snug">
+                        🇴🇲 عُمان فخورة بك! أتممت المغامرة بنجاح 🇴🇲
+                    </p>
+
+                    <div class="bg-amber-100 border-3 border-amber-400 w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-inner my-2">
+                        <span class="text-slate-800 font-black text-xl sm:text-2xl">الأعلام المجمعة:</span>
+                        <span class="text-4xl sm:text-5xl font-black text-red-600 flex items-center gap-2">
+                            🇴🇲 <span id="final-stars-count">0</span>
+                        </span>
+                    </div>
+
+                    <button onclick="restartGame()" class="touch-btn bg-gradient-to-r from-[#008751] to-[#00a86b] hover:from-[#006e42] hover:to-[#008751] text-white font-black text-2xl sm:text-3xl px-8 py-4 rounded-full shadow-2xl border-4 border-white transition-all transform active:scale-95 flex items-center gap-3">
+                        <span>🔄</span>
+                        <span>العب من جديد</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="confetti-holder" class="pointer-events-none absolute inset-0 overflow-hidden z-50"></div>
+        </div>
+    </div>
+
+    <script>
+        // Questions Data
+        const QUESTIONS_DATA = [
+            {
+                text: "ما اسم وطننا الحبيب؟ 🇴🇲",
+                options: [
+                    { text: "سلطنة عُمان 🇴🇲", correct: true },
+                    { text: "فرنسا 🇫🇷", correct: false }
+                ]
+            },
+            {
+                text: "أي من هذه الألوان موجود في علم عُمان؟",
+                options: [
+                    { text: "الأحمر والبرتقالي 🔴⚪🟢", correct: true },
+                    { text: "الوردي والبنفسجي 🟣", correct: false }
+                ]
+            },
+            {
+                text: "ماذا نرفع في الاحتفالات الوطنية؟",
+                options: [
+                    { text: "علم عُمان 🇴🇲", correct: true },
+                    { text: "كرة القدم ⚽", correct: false }
+                ]
+            },
+            {
+                text: "ماذا يزين السماء في الاحتفالات الوطنية؟",
+                options: [
+                    { text: "الألعاب النارية والأنوار 🎆", correct: true },
+                    { text: "الثلج والغيوم ❄️", correct: false }
+                ]
+            },
+            {
+                text: "ماذا نقول لسلطنتنا الغالية في العيد الوطني؟",
+                options: [
+                    { text: "كل عام وعُمان بألف خير 🇴🇲", correct: true },
+                    { text: "تصبحون على خير 😴", correct: false }
+                ]
+            }
+        ];
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const bgImg = document.getElementById('bgAsset');
+        const playerImg = document.getElementById('playerAsset');
+
+        let bgLoaded = false;
+        let playerLoaded = false;
+
+        bgImg.onload = () => { bgLoaded = true; };
+        playerImg.onload = () => { playerLoaded = true; };
+        if (bgImg.complete) bgLoaded = true;
+        if (playerImg.complete) playerLoaded = true;
+
+        const V_WIDTH = 1280;
+        const V_HEIGHT = 720;
+        let scaleRatio = 1;
+
+        let audioCtx = null;
+        let soundMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    audioCtx = new AudioCtx();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            soundMuted = !soundMuted;
+            const btn = document.getElementById('audio-toggle-btn');
+            if (btn) {
+                btn.innerText = soundMuted ? '🔇' : '🔊';
+            }
+        }
+
+        function playSynthesizedSound(type) {
+            if (soundMuted || !audioCtx) return;
+            try {
+                const now = audioCtx.currentTime;
+                if (type === 'jump') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(450, now + 0.18);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'collect') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+                } else if (type === 'correct') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.1);
+                    osc.frequency.setValueAtTime(659.25, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'win') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.value = freq;
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        const t = now + idx * 0.12;
+                        g.gain.setValueAtTime(0.25, t);
+                        g.gain.linearRampToValueAtTime(0.01, t + 0.28);
+                        o.start(t);
+                        o.stop(t + 0.28);
+                    });
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+
+        function drawOmaniBackground(ctx, cameraX) {
+            if (bgLoaded && bgImg.naturalWidth > 0) {
+                const imgAspect = bgImg.naturalWidth / bgImg.naturalHeight;
+                const drawWidth = V_HEIGHT * imgAspect;
+                const totalWidth = levelWidth + V_WIDTH;
+                
+                // Draw repeating background image based on camera position
+                let startX = -((cameraX * 0.4) % drawWidth);
+                while (startX < V_WIDTH) {
+                    ctx.drawImage(bgImg, startX, 0, drawWidth, V_HEIGHT);
+                    startX += drawWidth - 1;
+                }
+            } else {
+                // Procedural Omani Castle/Fort Fallback
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+                skyGrad.addColorStop(0, '#38bdf8');
+                skyGrad.addColorStop(0.6, '#bae6fd');
+                skyGrad.addColorStop(1, '#fef08a');
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+                ctx.fillStyle = '#fde047';
+                ctx.beginPath();
+                ctx.arc(V_WIDTH - 150, 90, 50, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw mountains and fort shapes
+                ctx.fillStyle = '#d97706';
+                const bgShift = (cameraX * 0.2) % V_WIDTH;
+                ctx.beginPath();
+                ctx.moveTo(-bgShift, groundY);
+                ctx.lineTo(200 - bgShift, 300);
+                ctx.lineTo(450 - bgShift, groundY);
+                ctx.lineTo(700 - bgShift, 260);
+                ctx.lineTo(950 - bgShift, groundY);
+                ctx.lineTo(1200 - bgShift, 320);
+                ctx.lineTo(1450 - bgShift, groundY);
+                ctx.fill();
+            }
+        }
+
+        function drawOmaniCharacter(ctx, x, y, w, h, facingRight) {
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+            if (!facingRight) ctx.scale(-1, 1);
+
+            if (playerLoaded && playerImg.naturalWidth > 0) {
+                ctx.drawImage(playerImg, -w / 2, -h / 2, w, h);
+            } else {
+                // Procedural Fallback if image not yet loaded
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(0, h / 2 - 5, w / 2.5, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#d62612';
+                ctx.beginPath();
+                ctx.moveTo(-w / 3, -h / 6);
+                ctx.lineTo(w / 3, -h / 6);
+                ctx.lineTo(w / 2.2, h / 2 - 10);
+                ctx.lineTo(-w / 2.2, h / 2 - 10);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#fcd5ce';
+                ctx.beginPath();
+                ctx.arc(0, -h / 3, w / 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#008751';
+                ctx.beginPath();
+                ctx.arc(0, -h / 3 - 4, w / 2.5, Math.PI, 0);
+                ctx.fill();
+
+                ctx.font = '32px Cairo, sans-serif';
+                ctx.fillText('🇴🇲', w / 4, -h / 8);
+            }
+
+            ctx.restore();
+        }
+
+        let gameState = 'START';
+        let score = 0;
+        let questionsAnswered = 0;
+        let currentQuestionIdx = 0;
+        let cameraX = 0;
+
+        // Player physics designed specifically to be forgiving and smooth for kids
+        const player = {
+            x: 100,
+            y: 350,
+            width: 100,   // Proportional size for character image
+            height: 140,  // Proportional size for character image
+            vx: 0,
+            vy: 0,
+            speed: 7.5,
+            jumpPower: -17,
+            isGrounded: false,
+            facingRight: true,
+            checkpointX: 100,
+            checkpointY: 350
+        };
+
+        const keys = {
+            left: false,
+            right: false,
+            jump: false
+        };
+
+        const levelWidth = 4500;
+        const groundY = 550;
+
+        // Continuous friendly ground without deep gaps to avoid frustrating kids
+        const platforms = [
+            { x: 0, y: groundY, width: 4500, height: 180 },
+
+            // Friendly low elevated platforms with extra width
+            { x: 400, y: 410, width: 220, height: 40 },
+            { x: 750, y: 360, width: 220, height: 40 },
+
+            { x: 1300, y: 410, width: 240, height: 40 },
+            { x: 1650, y: 350, width: 240, height: 40 },
+
+            { x: 2200, y: 410, width: 240, height: 40 },
+            { x: 2550, y: 350, width: 240, height: 40 },
+
+            { x: 3150, y: 410, width: 260, height: 40 },
+            { x: 3550, y: 350, width: 260, height: 40 }
+        ];
+
+        let collectibles = [];
+        let questionGates = [];
+
+        function generateLevelObjects() {
+            collectibles = [
+                { x: 250, y: 470, collected: false },
+                { x: 480, y: 330, collected: false },
+                { x: 830, y: 280, collected: false },
+
+                { x: 1150, y: 470, collected: false },
+                { x: 1400, y: 330, collected: false },
+                { x: 1750, y: 270, collected: false },
+
+                { x: 2050, y: 470, collected: false },
+                { x: 2300, y: 330, collected: false },
+                { x: 2650, y: 270, collected: false },
+
+                { x: 3000, y: 470, collected: false },
+                { x: 3250, y: 330, collected: false },
+                { x: 3650, y: 270, collected: false }
+            ];
+
+            questionGates = [
+                { x: 850, y: groundY - 120, qIdx: 0, answered: false },
+                { x: 1750, y: groundY - 120, qIdx: 1, answered: false },
+                { x: 2650, y: groundY - 120, qIdx: 2, answered: false },
+                { x: 3450, y: groundY - 120, qIdx: 3, answered: false },
+                { x: 4000, y: groundY - 120, qIdx: 4, answered: false }
+            ];
+        }
+
+        let particles = [];
+        function createParticles(x, y, color, count = 14) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 9,
+                    vy: (Math.random() - 0.5) * 9,
+                    size: Math.random() * 10 + 5,
+                    color: color,
+                    alpha: 1,
+                    life: 1
+                });
+            }
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            scaleRatio = Math.min(canvas.width / V_WIDTH, canvas.height / V_HEIGHT);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') keys.left = true;
+            if (e.key === 'ArrowRight') keys.right = true;
+            if (e.key === ' ' || e.key === 'ArrowUp') {
+                if (!keys.jump && player.isGrounded && gameState === 'PLAYING') {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                    playSynthesizedSound('jump');
+                }
+                keys.jump = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') keys.left = false;
+            if (e.key === 'ArrowRight') keys.right = false;
+            if (e.key === ' ' || e.key === 'ArrowUp') keys.jump = false;
+        });
+
+        function setupTouchButton(btnId, keyName) {
+            const btn = document.getElementById(btnId);
+            const startHandler = (e) => {
+                e.preventDefault();
+                initAudio();
+                if (keyName === 'jump') {
+                    if (player.isGrounded && gameState === 'PLAYING') {
+                        player.vy = player.jumpPower;
+                        player.isGrounded = false;
+                        playSynthesizedSound('jump');
+                    }
+                    keys.jump = true;
+                } else {
+                    keys[keyName] = true;
+                }
+            };
+            const endHandler = (e) => {
+                e.preventDefault();
+                keys[keyName] = false;
+            };
+
+            btn.addEventListener('touchstart', startHandler, { passive: false });
+            btn.addEventListener('touchend', endHandler, { passive: false });
+            btn.addEventListener('mousedown', startHandler);
+            btn.addEventListener('mouseup', endHandler);
+            btn.addEventListener('mouseleave', endHandler);
+        }
+
+        setupTouchButton('btn-left', 'left');
+        setupTouchButton('btn-right', 'right');
+        setupTouchButton('btn-jump', 'jump');
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            restartGame();
+        }
+
+        function restartGame() {
+            score = 0;
+            questionsAnswered = 0;
+            currentQuestionIdx = 0;
+            document.getElementById('hud-score').innerText = score;
+            document.getElementById('hud-qcount').innerText = questionsAnswered;
+
+            player.x = 100;
+            player.y = groundY - player.height;
+            player.vx = 0;
+            player.vy = 0;
+
+            generateLevelObjects();
+            document.getElementById('question-modal').classList.add('hidden');
+            document.getElementById('victory-modal').classList.add('hidden');
+            gameState = 'PLAYING';
+        }
+
+        function triggerQuestion(qIdx) {
+            gameState = 'QUESTION';
+            currentQuestionIdx = qIdx;
+            const q = QUESTIONS_DATA[qIdx];
+
+            document.getElementById('q-text').innerText = q.text;
+            document.getElementById('q-feedback').innerText = '';
+
+            const optionsBox = document.getElementById('q-options');
+            optionsBox.innerHTML = '';
+
+            q.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "touch-btn bg-white hover:bg-emerald-50 border-3 border-[#008751] text-slate-800 font-black text-2xl sm:text-3xl p-5 rounded-2xl shadow-lg transition-all";
+                btn.innerText = opt.text;
+                btn.onclick = () => handleAnswerSelect(opt.correct);
+                optionsBox.appendChild(btn);
+            });
+
+            document.getElementById('question-modal').classList.remove('hidden');
+        }
+
+        function handleAnswerSelect(isCorrect) {
+            const feedbackEl = document.getElementById('q-feedback');
+
+            if (isCorrect) {
+                playSynthesizedSound('correct');
+                feedbackEl.innerHTML = `<span class="text-[#008751]">🎉 أحسنت يا بطل! إجابة صحيحة! 🇴🇲</span>`;
+                
+                score += 1;
+                questionsAnswered += 1;
+                document.getElementById('hud-score').innerText = score;
+                document.getElementById('hud-qcount').innerText = questionsAnswered;
+
+                questionGates[currentQuestionIdx].answered = true;
+                spawnConfetti();
+
+                setTimeout(() => {
+                    document.getElementById('question-modal').classList.add('hidden');
+                    gameState = 'PLAYING';
+
+                    if (questionsAnswered >= 5) {
+                        triggerVictory();
+                    }
+                }, 1300);
+            } else {
+                playSynthesizedSound('jump');
+                feedbackEl.innerHTML = `<span class="text-amber-600">🌟 محاولة رائعة! حاول مرة أخرى 😃</span>`;
+            }
+        }
+
+        function triggerVictory() {
+            gameState = 'VICTORY';
+            playSynthesizedSound('win');
+            document.getElementById('final-stars-count').innerText = score;
+            document.getElementById('victory-modal').classList.remove('hidden');
+            spawnConfetti(60);
+        }
+
+        function spawnConfetti(count = 35) {
+            const holder = document.getElementById('confetti-holder');
+            holder.innerHTML = '';
+            const colors = ['#d62612', '#008751', '#ffffff', '#ffd700', '#3b82f6'];
+            
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 1.5 + 's';
+                piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+                holder.appendChild(piece);
+            }
+        }
+
+        function updatePhysics() {
+            if (gameState !== 'PLAYING') return;
+
+            if (keys.left) {
+                player.vx = -player.speed;
+                player.facingRight = false;
+            } else if (keys.right) {
+                player.vx = player.speed;
+                player.facingRight = true;
+            } else {
+                player.vx *= 0.7;
+            }
+
+            player.vy += 0.75;
+            player.x += player.vx;
+            player.y += player.vy;
+
+            if (player.x < 10) player.x = 10;
+
+            player.isGrounded = false;
+            for (let p of platforms) {
+                if (
+                    player.x + player.width * 0.7 > p.x &&
+                    player.x + player.width * 0.3 < p.x + p.width &&
+                    player.y + player.height >= p.y &&
+                    player.y + player.height - player.vy <= p.y + 20
+                ) {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    player.isGrounded = true;
+                }
+            }
+
+            // Flag Collection Logic
+            collectibles.forEach(c => {
+                if (!c.collected) {
+                    const cx = c.x;
+                    const cy = c.y;
+                    const px = player.x + player.width / 2;
+                    const py = player.y + player.height / 2;
+                    const dist = Math.hypot(px - cx, py - cy);
+
+                    if (dist < 55) {
+                        c.collected = true;
+                        score += 1;
+                        document.getElementById('hud-score').innerText = score;
+                        playSynthesizedSound('collect');
+                        createParticles(cx, cy, Math.random() > 0.5 ? '#d62612' : '#008751');
+                    }
+                }
+            });
+
+            // Question Gate Collision
+            questionGates.forEach(g => {
+                if (!g.answered) {
+                    const px = player.x + player.width / 2;
+                    if (Math.abs(px - g.x) < 50 && Math.abs((player.y + player.height) - g.y) < 70) {
+                        triggerQuestion(g.qIdx);
+                    }
+                }
+            });
+
+            // Particle Updates
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.03;
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Camera follow
+            const targetCamX = player.x - V_WIDTH / 3;
+            cameraX += (targetCamX - cameraX) * 0.1;
+            cameraX = Math.max(0, Math.min(cameraX, levelWidth - V_WIDTH));
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            const offsetX = (canvas.width - V_WIDTH * scaleRatio) / 2;
+            const offsetY = (canvas.height - V_HEIGHT * scaleRatio) / 2;
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scaleRatio, scaleRatio);
+
+            // Draw Omani Fort Background Image or Fallback
+            drawOmaniBackground(ctx, cameraX);
+
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
+            // Ground & Elevated Platforms
+            platforms.forEach((p, idx) => {
+                if (idx === 0) {
+                    // Main Ground
+                    ctx.fillStyle = '#15803d';
+                    ctx.fillRect(p.x, p.y, p.width, 12);
+
+                    ctx.fillStyle = '#b45309';
+                    ctx.fillRect(p.x, p.y + 12, p.width, p.height - 12);
+                } else {
+                    // Floating Platforms
+                    ctx.fillStyle = '#008751';
+                    ctx.fillRect(p.x, p.y, p.width, 10);
+
+                    ctx.fillStyle = '#d97706';
+                    ctx.fillRect(p.x, p.y + 10, p.width, p.height - 10);
+
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(p.x, p.y, p.width, p.height);
+                }
+            });
+
+            // Omani Collectible Flags
+            const time = Date.now() * 0.005;
+            collectibles.forEach(c => {
+                if (!c.collected) {
+                    const floatY = c.y + Math.sin(time + c.x) * 8;
+                    ctx.font = '45px Cairo, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🇴🇲', c.x, floatY);
+                }
+            });
+
+            // Question Station Markers
+            questionGates.forEach((g, idx) => {
+                if (!g.answered) {
+                    const floatY = g.y - 35 + Math.sin(time * 1.5 + idx) * 8;
+                    ctx.fillStyle = 'rgba(214, 38, 18, 0.8)';
+                    ctx.beginPath();
+                    ctx.ellipse(g.x, g.y + 10, 40, 12, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(g.x, floatY, 32, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#008751';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+
+                    ctx.font = 'bold 34px Cairo, sans-serif';
+                    ctx.fillStyle = '#d62612';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('⭐', g.x, floatY);
+                } else {
+                    ctx.font = '36px Cairo, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('✅', g.x, g.y - 20);
+                }
+            });
+
+            // Finish Line Celebration Archway
+            const endX = 4200;
+            ctx.fillStyle = '#d62612';
+            ctx.fillRect(endX, groundY - 200, 25, 200);
+            ctx.fillRect(endX + 180, groundY - 200, 25, 200);
+            ctx.fillStyle = '#008751';
+            ctx.fillRect(endX - 10, groundY - 230, 225, 35);
+            ctx.font = 'bold 30px Cairo, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.fillText('🇴🇲 عِيد سَعِيد 🇴🇲', endX + 100, groundY - 205);
+
+            // Draw Omani Girl Player Character
+            drawOmaniCharacter(ctx, player.x, player.y, player.width, player.height, player.facingRight);
+
+            // Particles Rendering
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            updatePhysics();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
