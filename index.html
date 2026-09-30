@@ -1,252 +1,296 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مغامرة عُمان</title>
+    <title>🇴🇲 مغامرة العيد الوطني العُماني 🇴🇲</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Arabic Google Fonts: Cairo & Changanga for playful kid friendly typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Changa:wght@700;800&display=swap" rel="stylesheet">
     <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-
-:root{
-    --oman-red:#c8102e;
-    --oman-green:#00843d;
-    --oman-white:#ffffff;
-    --gold:#f6c945;
-    --gold-light:#ffe58a;
-    --navy:#101827;
-    --navy-2:#172238;
-    --glass:rgba(12,20,35,.82);
-    --border:rgba(255,255,255,.16);
-    --shadow:0 18px 50px rgba(0,0,0,.35);
-}
-*{box-sizing:border-box;user-select:none;-webkit-user-select:none;font-family:'Tajawal',sans-serif}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111e}
-body{display:flex;justify-content:center;align-items:center}
-button{font:inherit}
-
-#gameContainer{
-    position:relative;width:min(1200px,100vw);height:min(675px,100vh);
-    min-height:520px;overflow:hidden;background:#07111e;
-    border:1px solid rgba(246,201,69,.75);border-radius:24px;
-    box-shadow:var(--shadow);outline:none;
-}
-canvas{width:100%;height:100%;display:block}
-
-.hud{
-    position:absolute;top:16px;left:16px;right:16px;z-index:6;
-    display:flex;justify-content:space-between;align-items:center;gap:12px;
-    pointer-events:none;
-}
-.hud-panel{
-    display:flex;align-items:center;gap:10px;padding:9px 14px;
-    color:#fff;background:rgba(8,16,29,.72);border:1px solid var(--border);
-    border-radius:14px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,.18)
-}
-.brand{font-weight:900;color:var(--gold);font-size:18px}
-.stat{font-size:15px;font-weight:700}.stat strong{color:var(--gold);font-size:18px}
-.progress-wrap{width:190px;height:8px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden}
-#progressBar{height:100%;width:0;background:linear-gradient(90deg,var(--oman-green),var(--gold));transition:width .35s ease}
-
-.overlay{
-    position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;
-    justify-content:center;align-items:center;padding:28px;text-align:center;color:#fff;
-    background:linear-gradient(135deg,rgba(6,15,28,.92),rgba(12,25,43,.86));
-    backdrop-filter:blur(12px);
-}
-.hidden{display:none!important}
-
-.hero-card{
-    width:min(720px,92%);padding:38px 34px;border-radius:28px;
-    background:linear-gradient(145deg,rgba(23,34,56,.96),rgba(10,19,33,.96));
-    border:1px solid rgba(246,201,69,.38);box-shadow:0 24px 70px rgba(0,0,0,.4);
-}
-.emblem{
-    width:76px;height:76px;margin:0 auto 16px;border-radius:22px;
-    display:grid;place-items:center;font-size:40px;
-    background:linear-gradient(145deg,var(--oman-red),var(--oman-green));
-    box-shadow:0 12px 28px rgba(0,0,0,.25)
-}
-h1{margin:0 0 10px;color:#fff;font-size:clamp(30px,4vw,48px);font-weight:900;letter-spacing:-.5px}
-.hero-card h1 span{color:var(--gold)}
-.subtitle{margin:0 auto 24px;max-width:600px;color:#d9e1ec;font-size:18px;line-height:1.8}
-.instructions{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 28px
-}
-.instruction{
-    padding:13px 10px;border-radius:14px;background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.08);font-size:14px;color:#e9eef5
-}
-.instruction b{display:block;color:var(--gold);font-size:20px;margin-bottom:4px}
-
-.btn{
-    border:0;border-radius:15px;padding:14px 30px;min-width:210px;
-    color:#161616;background:linear-gradient(135deg,var(--gold-light),var(--gold));
-    font-size:19px;font-weight:900;cursor:pointer;
-    box-shadow:0 10px 28px rgba(246,201,69,.22);
-    transition:transform .18s ease,box-shadow .18s ease
-}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(246,201,69,.3)}
-.btn:active{transform:scale(.98)}
-.btn.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid var(--border);box-shadow:none}
-
-.quiz-card{
-    width:min(680px,94%);padding:30px;border-radius:26px;
-    background:linear-gradient(145deg,#172238,#0e1829);
-    border:1px solid rgba(246,201,69,.45);box-shadow:0 24px 70px rgba(0,0,0,.45)
-}
-.quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-.quiz-badge{color:var(--gold);font-weight:900;font-size:15px}
-.quiz-score{color:#cbd5e1;font-size:14px}
-.quiz-card h2{margin:0;color:#fff;font-size:clamp(22px,3vw,30px);line-height:1.5}
-.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
-.option-btn{
-    min-height:64px;padding:14px 18px;border:1px solid rgba(255,255,255,.12);
-    border-radius:15px;background:#23324b;color:#fff;font-size:17px;font-weight:700;
-    cursor:pointer;text-align:right;display:flex;align-items:center;gap:10px;
-    transition:all .18s ease
-}
-.option-btn .letter{
-    flex:0 0 34px;width:34px;height:34px;border-radius:10px;
-    display:grid;place-items:center;background:rgba(246,201,69,.14);color:var(--gold);font-weight:900
-}
-.option-btn:hover{transform:translateY(-2px);border-color:rgba(246,201,69,.65);background:#2a3c5b}
-.option-btn.correct{background:rgba(0,132,61,.9);border-color:#69e09b}
-.option-btn.wrong{background:rgba(200,16,46,.9);border-color:#ff8fa4}
-.feedback{
-    min-height:26px;margin-top:14px;font-weight:800;font-size:15px;color:#dce6f2
-}
-
-#touchControls{
-    position:absolute;bottom:16px;left:0;width:100%;z-index:5;
-    display:flex;justify-content:space-between;padding:0 18px;pointer-events:none
-}
-.touch-group{display:flex;gap:10px;pointer-events:auto}
-.touch-btn{
-    width:64px;height:64px;border-radius:18px;display:grid;place-items:center;
-    color:#fff;background:rgba(8,16,29,.58);border:1px solid rgba(255,255,255,.25);
-    backdrop-filter:blur(10px);font-size:27px;cursor:pointer;touch-action:manipulation;
-    box-shadow:0 8px 22px rgba(0,0,0,.2);transition:transform .1s,background .1s
-}
-.touch-btn:active{transform:scale(.93);background:rgba(0,132,61,.8)}
-
-.result-title{color:var(--gold)}
-.result-score{
-    margin:14px auto 20px;padding:12px 22px;width:max-content;
-    border-radius:14px;background:rgba(246,201,69,.1);
-    border:1px solid rgba(246,201,69,.25);font-size:18px;font-weight:800
-}
-.small-note{color:#aebbc9;font-size:13px;margin-top:14px}
-
-@media (max-width:760px){
-    #gameContainer{border-radius:0;border:0;min-height:100vh}
-    .hud{top:10px;left:10px;right:10px}.brand{display:none}
-    .progress-wrap{width:120px}.stat{font-size:13px}
-    .instructions{grid-template-columns:1fr;max-width:360px}
-    .hero-card{padding:28px 20px}.subtitle{font-size:16px}
-    .options-grid{grid-template-columns:1fr}
-    .quiz-card{padding:22px}
-    .option-btn{min-height:58px;font-size:16px}
-    .touch-btn{width:58px;height:58px}
-}
-</style>
+        * {
+            font-family: 'Cairo', 'Changa', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        body {
+            background-color: #0f172a;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #38bdf8, #bae6fd);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Touch buttons styling for kids - Professional 3D Tactile Design */
+        .kid-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+            border: 4px solid #f59e0b;
+            box-shadow: 0 8px 0 #d97706, 0 12px 25px rgba(0,0,0,0.3);
+            border-radius: 2rem;
+            backdrop-filter: blur(8px);
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .kid-btn:active {
+            transform: translateY(6px) scale(0.96);
+            box-shadow: 0 2px 0 #d97706, 0 4px 12px rgba(0,0,0,0.25);
+            background: #fef08a;
+        }
+        .jump-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 4px solid #34d399;
+            box-shadow: 0 8px 0 #047857, 0 12px 25px rgba(0,0,0,0.35);
+            border-radius: 2.2rem;
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .jump-btn:active {
+            transform: translateY(6px) scale(0.96);
+            box-shadow: 0 2px 0 #047857, 0 4px 12px rgba(0,0,0,0.2);
+            background: #047857;
+        }
+        /* Floating animations */
+        @keyframes float-kid {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float-kid 2.5s ease-in-out infinite;
+        }
+        @keyframes pop-bounce {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in {
+            animation: pop-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-900 text-white select-none">
 
-<div id="gameContainer" tabindex="0">
-    <canvas id="gameCanvas" width="1000" height="550"></canvas>
+    <div id="game-container">
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
 
-    <div class="hud hidden" id="hud">
-        <div class="hud-panel">
-            <div class="brand">مغامرة عُمان 🇴🇲</div>
-            <div class="stat">المحطات <strong id="progressText">0/5</strong></div>
-            <div class="progress-wrap"><div id="progressBar"></div></div>
-        </div>
-        <div class="hud-panel">
-            <div class="stat">⭐ النقاط <strong id="scoreText">0</strong></div>
-            <div class="stat">↟ اقفز فوق المنصات</div>
-        </div>
-    </div>
-
-    <!-- واجهة البداية -->
-    <div id="startScreen" class="overlay">
-        <div class="hero-card">
-            <div class="emblem">🇴🇲</div>
-            <h1>مغامرة <span>عُمان</span></h1>
-            <p class="subtitle">رحلة تعليمية تفاعلية في أجواء العيد الوطني العُماني. استكشف الطريق، أجب عن الأسئلة، واجمع النجاحات حتى تصل إلى القلعة.</p>
-            <div class="instructions">
-                <div class="instruction"><b>← →</b>تحرّك في المغامرة</div>
-                <div class="instruction"><b>▲</b>اقفز وتفاعل مع الصناديق</div>
-                <div class="instruction"><b>★</b>أجب لتحصل على التقدّم</div>
+        <!-- TOP HUD BAR (For Kids: Big, Clear, Colorful) -->
+        <div id="hud" class="absolute top-3 left-3 right-3 flex justify-between items-center z-10 pointer-events-none">
+            <!-- Left Info: Oman Flags Score -->
+            <div class="flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 border-4 border-amber-600 px-4 py-2 rounded-3xl shadow-xl pointer-events-auto transform hover:scale-105 transition">
+                <span class="text-3xl animate-bounce">🇴🇲</span>
+                <div class="text-slate-900 font-black text-xl md:text-2xl">
+                    الأعلام: <span id="score-display" class="text-red-700">0</span>
+                </div>
             </div>
-            <button class="btn" id="startBtn">ابدأ المغامرة</button>
-            <div class="small-note">يمكن اللعب بلوحة المفاتيح أو أزرار اللمس.</div>
-        </div>
-    </div>
 
-    <!-- واجهة السؤال -->
-    <div id="quizScreen" class="overlay hidden">
-        <div class="quiz-card">
-            <div class="quiz-top">
-                <div class="quiz-badge" id="quizNumber">المحطة 1 من 5</div>
-                <div class="quiz-score">النتيجة: <strong id="quizScore">0</strong></div>
+            <!-- Middle Badge: Oman Flag Theme -->
+            <div class="hidden sm:flex items-center gap-2 bg-white/95 border-4 border-emerald-600 px-5 py-2 rounded-3xl shadow-xl pointer-events-auto">
+                <span class="text-2xl">❓</span>
+                <span class="text-base md:text-lg font-black text-slate-800">السؤال: <span id="question-progress" class="text-emerald-600 text-xl">0 / 5</span></span>
             </div>
-            <h2 id="quizQuestion">السؤال هنا؟</h2>
-            <div id="quizOptions" class="options-grid"></div>
-            <div id="feedback" class="feedback" aria-live="polite"></div>
+
+            <!-- Right Controls: Mute & Custom Asset Modal -->
+            <div class="flex items-center gap-2 pointer-events-auto">
+                <!-- Mobile Questions Progress -->
+                <div class="sm:hidden bg-white/90 border-2 border-emerald-500 px-3 py-1 rounded-2xl text-xs font-black text-emerald-800">
+                    ❓ <span id="question-progress-mobile">0/5</span>
+                </div>
+                <!-- Sound Toggle -->
+                <button id="sound-btn" onclick="toggleAudio()" class="w-12 h-12 bg-white border-4 border-amber-500 rounded-2xl flex items-center justify-center text-amber-600 text-xl shadow-lg active:scale-95 transition">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <!-- Image & Asset Customizer -->
+                <button onclick="openCustomizer()" title="تغيير الصور" class="w-12 h-12 bg-white border-4 border-emerald-500 rounded-2xl flex items-center justify-center text-emerald-600 text-xl shadow-lg active:scale-95 transition">
+                    <i class="fa-solid fa-image"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MOBILE TOUCH CONTROLS (Big Easy Buttons) -->
+        <div id="touch-controls" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none">
+            <!-- Left / Right Movement (Fixed LTR Direction and Correct Arrows) -->
+            <div class="flex gap-4 pointer-events-auto" dir="ltr">
+                <button id="btn-left" class="kid-btn w-20 h-20 rounded-3xl flex items-center justify-center text-amber-800 text-4xl font-extrabold active:bg-amber-200" title="يسار">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button id="btn-right" class="kid-btn w-20 h-20 rounded-3xl flex items-center justify-center text-amber-800 text-4xl font-extrabold active:bg-amber-200" title="يمين">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+            <!-- Jump Button -->
+            <div class="pointer-events-auto">
+                <button id="btn-jump" class="jump-btn w-24 h-24 rounded-3xl flex items-center justify-center text-white text-4xl font-extrabold shadow-2xl">
+                    <i class="fa-solid fa-angles-up"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- START SCREEN OVERLAY -->
+        <div id="start-screen" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-30 p-4 text-center">
+            <div class="max-w-md w-full bg-amber-50 border-8 border-red-500 rounded-3xl p-6 shadow-2xl animate-float relative overflow-hidden">
+                <!-- Omani Flag Decorative Top Bar -->
+                <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-red-600 via-white to-emerald-600"></div>
+
+                <div class="w-28 h-28 mx-auto mt-2 mb-3 bg-white border-4 border-amber-400 rounded-full flex items-center justify-center text-6xl shadow-md overflow-hidden ring-4 ring-red-400/50">
+                    <img id="start-char-preview" src="813.png" onerror="this.onerror=null; this.src='https://placehold.co/120x120/dc2626/ffffff?text=🇴🇲';" class="w-full h-full object-cover" alt="الشخصية">
+                </div>
+
+                <h1 class="text-2xl md:text-3xl font-black text-red-600 mb-1 tracking-wide drop-shadow-sm">
+                    🇴🇲 مغامرة العيد الوطني العُماني 🇴🇲
+                </h1>
+                <p class="text-emerald-700 text-lg font-extrabold mb-5">
+                    العب، تعلّم، واحتفل بعُمان! 🎉
+                </p>
+
+                <div class="space-y-3">
+                    <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:brightness-110 text-white font-black text-2xl rounded-2xl shadow-xl border-b-4 border-emerald-900 active:scale-95 transition flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-play text-3xl"></i>
+                        <span>ابدأ اللعب الآن!</span>
+                    </button>
+                </div>
+
+                <div class="mt-5 pt-3 border-t-2 border-amber-200 text-slate-600 font-extrabold text-sm flex justify-around">
+                    <span>⬅️ يسار | ➡️ يمين</span>
+                    <span>⬆️ Space للقفز</span>
+                </div>
+            </div>
+        </div>
+        <!-- QUIZ MODAL DIALOG FOR KIDS (Positioned higher for comfortable viewport viewing) -->
+        <div id="quiz-modal" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-start justify-center pt-10 sm:pt-16 z-40 p-4">
+            <div class="max-w-md w-full bg-white border-8 border-amber-400 rounded-3xl p-6 shadow-2xl relative text-center pop-in">
+                <!-- Top Ribbon -->
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-600 text-white text-lg font-black px-6 py-1.5 rounded-full border-4 border-amber-300 shadow-md flex items-center gap-2">
+                    <span>🇴🇲</span>
+                    <span>سؤال العيد الوطني!</span>
+                </div>
+
+                <div id="modal-q-number" class="text-sm font-black text-slate-500 mt-2 mb-2">السؤال 1 من 5</div>
+
+                <!-- Question Text -->
+                <h2 id="modal-q-text" class="text-xl md:text-2xl font-black text-slate-800 mb-5 bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 leading-snug shadow-inner">
+                    ما اسم بلدنا؟
+                </h2>
+
+                <!-- Options Grid (2 Big Kid Buttons) -->
+                <div id="modal-options" class="grid grid-cols-1 gap-4 mb-3">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Kid Feedback Message -->
+                <div id="feedback-msg" class="font-black text-xl min-h-[32px]"></div>
+            </div>
+        </div>
+
+        <!-- VICTORY CELEBRATION MODAL -->
+        <div id="victory-modal" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center z-50 p-4 text-center">
+            <div class="max-w-lg w-full bg-amber-50 border-8 border-emerald-500 rounded-3xl p-6 md:p-8 shadow-2xl relative pop-in max-h-[90vh] overflow-y-auto">
+                <!-- Omani Flag Accent -->
+                <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-red-600 via-white to-emerald-600"></div>
+
+                <div class="text-7xl mb-2 animate-bounce">🎆</div>
+                <h2 class="text-3xl md:text-4xl font-black text-emerald-600 mb-1">🎉 مبارك الفوز يا بطل! 🎉</h2>
+                <p class="text-slate-800 font-extrabold text-lg mb-4">
+                    🇴🇲 أتممت مغامرة العيد الوطني العُماني بنجاح باهر! 🇴🇲
+                </p>
+
+                <!-- Detailed Victory Scoreboard -->
+                <div class="bg-white border-4 border-amber-300 rounded-2xl p-4 md:p-5 mb-5 shadow-inner space-y-3 text-right">
+                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-2">
+                        <span class="text-slate-700 font-black text-base md:text-lg">🇴🇲 الأعلام المجمعة:</span>
+                        <span id="final-flags-count" class="text-red-600 font-black text-xl md:text-2xl">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-2">
+                        <span class="text-slate-700 font-black text-base md:text-lg">❓ الأسئلة المحلولة بنجاح:</span>
+                        <span id="final-quiz-count" class="text-emerald-600 font-black text-xl md:text-2xl">5 / 5</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-amber-100 p-3 rounded-xl border-2 border-amber-400">
+                        <span class="text-amber-900 font-black text-lg md:text-xl">⭐ المجموع النهائي للنقاط:</span>
+                        <span id="final-score" class="text-3xl md:text-4xl text-red-600 font-black">0</span>
+                    </div>
+                </div>
+
+                <!-- Congratulations Card -->
+                <div class="bg-gradient-to-r from-red-600 via-amber-500 to-emerald-600 text-white p-4 rounded-2xl font-black text-lg shadow-md mb-6 leading-relaxed">
+                    🌟 وسام التميّز الوطني العُماني 🌟
+                    <p class="text-sm font-bold mt-1 text-amber-100">"دام عزّك يا وطن، وكل عام وسلطنة عُمان وشعبها العظيم بخير وأمان!" 🇴🇲✨</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-red-500 via-red-600 to-emerald-600 hover:brightness-110 text-white font-black text-2xl rounded-2xl shadow-xl border-b-4 border-red-900 transition active:scale-95 flex items-center justify-center gap-3">
+                    🔄 <span>العب مرة أخرى</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- CUSTOM IMAGE / ASSETS UPLOADER MODAL -->
+        <div id="custom-modal" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div class="max-w-md w-full bg-white border-4 border-emerald-500 rounded-3xl p-6 shadow-2xl relative text-slate-800">
+                <div class="flex justify-between items-center mb-4 border-b-2 border-slate-100 pb-2">
+                    <h3 class="text-lg font-black text-emerald-700">🖼️ تخصيص الصور والبيئة</h3>
+                    <button onclick="closeCustomizer()" class="text-slate-400 hover:text-slate-800 text-2xl font-bold">✕</button>
+                </div>
+                
+                <p class="text-xs font-bold text-slate-600 mb-4">تتيح لك هذه الخانة رفـع صورة شخصية خاصة أو تغيير صورة الخلفية في اللعبة:</p>
+
+                <div class="space-y-4 text-right">
+                    <div>
+                        <label class="block text-xs font-black text-slate-700 mb-1">صورة الشخصية (البطل):</label>
+                        <input type="file" id="char-upload" accept="image/*" onchange="uploadCharacterImage(event)" class="text-xs file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-amber-100 file:text-amber-800 file:font-bold hover:file:bg-amber-200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-700 mb-1">صورة الخلفية (البيئة العُمانية):</label>
+                        <input type="file" id="bg-upload" accept="image/*" onchange="uploadBackgroundImage(event)" class="text-xs file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-emerald-800 file:font-bold hover:file:bg-emerald-200">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button onclick="closeCustomizer()" class="w-full py-3 bg-emerald-600 text-white font-black rounded-xl shadow-md">تم والحفظ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST / NOTIFICATION MESSAGE FOR KIDS -->
+        <div id="toast" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-amber-400 border-4 border-white text-slate-900 font-black px-6 py-2 rounded-full shadow-2xl text-lg animate-bounce">
+            <span id="toast-text">⭐ أحسنت!</span>
         </div>
     </div>
 
-    <!-- واجهة الفوز -->
-    <div id="winScreen" class="overlay hidden">
-        <div class="hero-card">
-            <div class="emblem">🏆</div>
-            <h1 class="result-title">أحسنت! وصلت إلى القلعة</h1>
-            <p class="subtitle">أكملت محطات المغامرة بنجاح وأثبتَّ معرفتك بعُمان.</p>
-            <div class="result-score">⭐ نتيجتك: <span id="finalScore">0</span> / 5</div>
-            <button class="btn" id="restartBtn">ابدأ من جديد</button>
-        </div>
-    </div>
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER SYSTEM (Web Audio API - Standalone & Cheerful)
+           ========================================================================== */
+        let audioCtx = null;
+        let isMuted = false;
 
-    <!-- التحكم باللمس -->
-    <div id="touchControls">
-        <div class="touch-group">
-            <div class="touch-btn" id="btnLeft">◀</div>
-            <div class="touch-btn" id="btnRight">▶</div>
-        </div>
-        <div class="touch-group">
-            <div class="touch-btn" id="btnJump">▲</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const container = document.getElementById('gameContainer');
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // تحميل الصور
-    const bgImage = new Image();
-    bgImage.src = '814.webp';
-
-    const playerImage = new Image();
-    playerImage.src = '813.png';
-
-    // محرك الصوت
-    let audioCtx = null;
-
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
         }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    }
 
-    function playSound(type) {
-        if (!audioCtx || audioCtx.state !== 'running') return;
-        try {
+        function playSound(type) {
+            if (isMuted) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -254,731 +298,941 @@ h1{margin:0 0 10px;color:#fff;font-size:clamp(30px,4vw,48px);font-weight:900;let
 
             if (type === 'jump') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(550, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
-            } else if (type === 'hitBlock') {
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(550, now + 0.18);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            } else if (type === 'star') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now); // C6
+                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+                osc.start(now);
+                osc.stop(now + 0.22);
             } else if (type === 'correct') {
-                [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
                     o.connect(g);
                     g.connect(audioCtx.destination);
                     o.type = 'sine';
-                    o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
-                    g.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
-                    g.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.18);
-                    o.start(audioCtx.currentTime + idx * 0.08);
-                    o.stop(audioCtx.currentTime + idx * 0.08 + 0.18);
+                    o.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    g.gain.setValueAtTime(0.25, now + idx * 0.08);
+                    g.gain.linearRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+                    o.start(now + idx * 0.08);
+                    o.stop(now + idx * 0.08 + 0.25);
                 });
-            } else if (type === 'firework') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'retry') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(330, now);
+                osc.frequency.setValueAtTime(293.66, now + 0.12);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'victory') {
+                const fanfare = [523.25, 523.25, 659.25, 783.99, 1046.50];
+                const times =   [0,      0.12,   0.24,   0.36,   0.50];
+                fanfare.forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'triangle';
+                    o.frequency.setValueAtTime(freq, now + times[idx]);
+                    g.gain.setValueAtTime(0.3, now + times[idx]);
+                    g.gain.linearRampToValueAtTime(0.01, now + times[idx] + 0.35);
+                    o.start(now + times[idx]);
+                    o.stop(now + times[idx] + 0.35);
+                });
             }
-        } catch(e) {}
-    }
-
-    // الأسئلة
-    const questions = [
-        {
-            q: "متى تحتفل سلطنة عُمان بالعيد الوطني؟",
-            options: ["18 نوفمبر", "23 يوليو", "1 يناير", "18 ديسمبر"],
-            answer: 0
-        },
-        {
-            q: "ما عاصمة سلطنة عُمان؟",
-            options: ["صلالة", "مسقط", "صحار", "نزوى"],
-            answer: 1
-        },
-        {
-            q: "ما الرمز الذي يظهر في شعار سلطنة عُمان الوطني؟",
-            options: ["الخنجر والسيفان", "النخلة والسيف", "الصقر والخنجر", "السفينة والنجمة"],
-            answer: 0
-        },
-        {
-            q: "ما اللون الذي يرمز إلى الخصب والزراعة في العلم العُماني؟",
-            options: ["الأبيض", "الأحمر", "الأخضر", "الأصفر"],
-            answer: 2
-        },
-        {
-            q: "أي مدينة تُعرف بأنها من المدن التاريخية المهمة في عُمان؟",
-            options: ["نزوى", "دبي", "الدوحة", "الكويت"],
-            answer: 0
         }
-    ];
 
-    let gameState = 'START';
-    let activeBlock = null;
-    let globalFrame = 0;
-    let score = 0;
-    let answeredCount = 0;
-
-    const keys = { right: false, left: false, up: false };
-
-    let cameraX = 0;
-    const worldWidth = 3300;
-    const groundY = 430; // مستوى الأرض ثابت تماماً
-
-    // شخصية بفيزياء ثابتة ومباشرة جداً للأطفال
-    const player = {
-        x: 100,
-        y: groundY - 75,
-        width: 55,
-        height: 75,
-        speed: 5, // حركة ثابتة فورية
-        vy: 0,
-        gravity: 0.65,
-        jumpPower: -13.8,
-        grounded: true,
-        facing: 'right'
-    };
-
-    // أحجار وزينة صخرية بسيطة فقط (بدون حفر)
-    const stones = [
-        { x: 520, y: groundY - 34, width: 82, height: 34 },
-        { x: 1040, y: groundY - 48, width: 105, height: 48 },
-        { x: 1530, y: groundY - 30, width: 74, height: 30 },
-        { x: 2050, y: groundY - 58, width: 120, height: 58 },
-        { x: 2580, y: groundY - 38, width: 90, height: 38 }
-    ];
-
-    // منصات وقفزات متنوعة لإعطاء الرحلة تضاريس حقيقية.
-    const platforms = [
-        { x: 405,  y: groundY - 105, width: 175, height: 20 },
-        { x: 965,  y: groundY - 125, width: 180, height: 20 },
-        { x: 1525, y: groundY - 105, width: 175, height: 20 },
-        { x: 2075, y: groundY - 135, width: 185, height: 20 },
-        { x: 2585, y: groundY - 110, width: 175, height: 20 }
-    ];
-
-    // مناطق منخفضة بصرياً تشبه الأودية، مع أرضية قابلة للعب.
-    const terrainDecor = [
-        { x: 0, w: 360, type: 'plain' },
-        { x: 360, w: 500, type: 'rocks' },
-        { x: 860, w: 500, type: 'valley' },
-        { x: 1360, w: 500, type: 'rocks' },
-        { x: 1860, w: 540, type: 'valley' },
-        { x: 2400, w: 600, type: 'rocks' }
-    ];
-
-    // صناديق الأسئلة متدلية وقريبة جداً لسهولة الضرب (ارتفاع بسيط)
-    const blocks = [
-        { x: 470,  y: groundY - 205, width: 60, height: 60, hit: false, questionIndex: 0, bounceY: 0 },
-        { x: 1030, y: groundY - 230, width: 60, height: 60, hit: false, questionIndex: 1, bounceY: 0 },
-        { x: 1590, y: groundY - 205, width: 60, height: 60, hit: false, questionIndex: 2, bounceY: 0 },
-        { x: 2140, y: groundY - 240, width: 60, height: 60, hit: false, questionIndex: 3, bounceY: 0 },
-        { x: 2650, y: groundY - 210, width: 60, height: 60, hit: false, questionIndex: 4, bounceY: 0 }
-    ];
-
-    // القلعة وسارية العلم
-    const finishLine = {
-        flagX: 2850,
-        flagY: groundY - 260,
-        poleHeight: 260,
-        flagSlideY: groundY - 230,
-        fortX: 2980,
-        fortY: groundY - 220,
-        fortWidth: 320,
-        fortHeight: 220
-    };
-
-    let particles = [];
-    let fireworks = [];
-
-    function addParticles(x, y, color) {
-        for (let i = 0; i < 15; i++) {
-            particles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 6,
-                vy: (Math.random() - 0.5) * 6,
-                color: color,
-                size: Math.random() * 5 + 3,
-                life: 25
-            });
-        }
-    }
-
-    function createFirework() {
-        const x = finishLine.fortX + Math.random() * finishLine.fortWidth;
-        const y = finishLine.fortY - Math.random() * 120;
-        const colors = ['#D62612', '#007A3D', '#FFD700', '#FFFFFF'];
-        for (let i = 0; i < 25; i++) {
-            fireworks.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 8,
-                vy: (Math.random() - 0.5) * 8,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                size: 4,
-                life: 35
-            });
-        }
-        playSound('firework');
-    }
-
-    // المفاتيح
-    window.addEventListener('keydown', e => {
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
-        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
-        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
-        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
-            if (player.grounded && gameState === 'PLAYING') {
-                player.vy = player.jumpPower;
-                player.grounded = false;
-                playSound('jump');
+        function toggleAudio() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('sound-icon');
+            if (isMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-slate-400";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-amber-600";
+                playSound('star');
             }
-            keys.up = true;
         }
-    });
 
-    window.addEventListener('keyup', e => {
-        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
-        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
-        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = false;
-    });
-
-    // أزرار اللمس
-    const setupTouchBtn = (id, keyName) => {
-        const btn = document.getElementById(id);
-        const startAction = (e) => {
-            e.preventDefault();
-            initAudio();
-            if (keyName === 'up' && player.grounded && gameState === 'PLAYING') {
-                player.vy = player.jumpPower;
-                player.grounded = false;
-                playSound('jump');
+        /* ==========================================================================
+           2. 5 KID-FRIENDLY QUESTIONS (Exact specifications)
+           ========================================================================== */
+        const quizQuestions = [
+            {
+                q: "ما اسم بلدنا؟",
+                options: ["عُمان 🇴🇲", "مصر 🇪🇬"],
+                correct: 0
+            },
+            {
+                q: "ما لون موجود في علم عُمان؟",
+                options: ["الأحمر 🔴", "الأصفر 🟡"],
+                correct: 0
+            },
+            {
+                q: "ماذا نرفع في الاحتفالات الوطنية؟",
+                options: ["علم عُمان 🇴🇲", "كتاب 📖"],
+                correct: 0
+            },
+            {
+                q: "ماذا نشاهد في بعض الاحتفالات؟",
+                options: ["الألعاب النارية 🎆", "الثلج ❄️️"],
+                correct: 0
+            },
+            {
+                q: "ماذا نقول لعُمان في العيد الوطني؟",
+                options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"],
+                correct: 0
             }
-            keys[keyName] = true;
-        };
-        const endAction = (e) => {
-            e.preventDefault();
-            keys[keyName] = false;
+        ];
+
+        /* ==========================================================================
+           3. SPRITE AND IMAGE HANDLING
+           ========================================================================== */
+        const charImage = new Image();
+        charImage.src = '813.png'; // Updated Omani character sprite
+
+        const defaultBgImg = new Image();
+        defaultBgImg.src = '814.webp'; // Updated Omani national day environment background
+
+        let customBgImg = defaultBgImg;
+
+        function uploadCharacterImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    charImage.src = evt.target.result;
+                    document.getElementById('start-char-preview').src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadBackgroundImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        customBgImg = img;
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openCustomizer() {
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeCustomizer() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        /* ==========================================================================
+           4. GAME ENGINE & LEVEL DESIGN
+           ========================================================================== */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gameState = 'START'; // START, PLAYING, QUIZ, VICTORY
+        let cameraX = 0;
+        let score = 0;
+        let activeQuestionIndex = 0;
+        let lastSafeX = 100;
+        let lastSafeY = 300;
+        let pendingGate = null;
+
+        const keys = { left: false, right: false, up: false };
+
+        const player = {
+            x: 100,
+            y: 300,
+            width: 54,
+            height: 72,
+            vx: 0,
+            vy: 0,
+            speed: 5.5,
+            jumpPower: -13,
+            gravity: 0.58,
+            isGrounded: false,
+            facing: 'right',
+            bounceY: 0
         };
 
-        btn.addEventListener('pointerdown', startAction);
-        btn.addEventListener('pointerup', endAction);
-        btn.addEventListener('pointercancel', endAction);
-        btn.addEventListener('pointerleave', endAction);
-    };
+        const LEVEL_WIDTH = 3800;
+        let platforms = [];
+        let collectibles = [];
+        let questionGates = [];
+        let particles = [];
+        let fireworks = [];
+        let endGate = null;
 
-    setupTouchBtn('btnLeft', 'left');
-    setupTouchBtn('btnRight', 'right');
-    setupTouchBtn('btnJump', 'up');
+        function buildLevel() {
+            platforms = [];
+            collectibles = [];
+            questionGates = [];
+            particles = [];
+            fireworks = [];
 
-    document.getElementById('startBtn').onclick = () => {
-        initAudio();
-        container.focus();
-        document.getElementById('startScreen').classList.add('hidden');
-        document.getElementById('hud').classList.remove('hidden');
-        updateHUD();
-        gameState = 'PLAYING';
-    };
+            const groundY = canvas.height - 80;
 
-    document.getElementById('restartBtn').onclick = () => {
-        player.x = 100;
-        player.y = groundY - player.height;
-        score = 0;
-        answeredCount = 0;
-        updateHUD();
-        player.vy = 0;
-        cameraX = 0;
-        finishLine.flagSlideY = groundY - 230;
-        blocks.forEach(b => b.hit = false);
-        fireworks = [];
-        particles = [];
-        document.getElementById('winScreen').classList.add('hidden');
-        container.focus();
-        gameState = 'PLAYING';
-    };
+            // Simple contiguous ground for kids with wide easy steps
+            platforms.push({ x: 0, y: groundY, width: 1000, height: 100 });
+            platforms.push({ x: 1080, y: groundY, width: 1100, height: 100 });
+            platforms.push({ x: 2240, y: groundY, width: 1600, height: 100 });
 
-    function updateHUD() {
-        document.getElementById('scoreText').textContent = score;
-        document.getElementById('progressText').textContent = `${answeredCount}/${questions.length}`;
-        document.getElementById('progressBar').style.width = `${(answeredCount / questions.length) * 100}%`;
-        document.getElementById('quizScore').textContent = score;
-    }
+            // Low, simple floating cloud platforms
+            const floatPlats = [
+                { x: 300, y: groundY - 100, w: 160 },
+                { x: 600, y: groundY - 120, w: 180 },
+                { x: 1010, y: groundY - 80, w: 100 }, // Bridge over gap 1
+                { x: 1300, y: groundY - 110, w: 180 },
+                { x: 1650, y: groundY - 130, w: 200 },
+                { x: 2170, y: groundY - 80, w: 100 }, // Bridge over gap 2
+                { x: 2450, y: groundY - 110, w: 180 },
+                { x: 2800, y: groundY - 120, w: 200 },
+                { x: 3200, y: groundY - 100, w: 220 }
+            ];
 
-    function triggerQuiz(block) {
-        gameState = 'QUIZ';
-        activeBlock = block;
-        const qData = questions[block.questionIndex];
+            floatPlats.forEach(p => {
+                platforms.push({ x: p.x, y: p.y, width: p.w, height: 26, type: 'float' });
+            });
 
-        document.getElementById('quizNumber').textContent = `المحطة ${block.questionIndex + 1} من ${questions.length}`;
-        document.getElementById('quizQuestion').innerText = qData.q;
-        document.getElementById('feedback').textContent = '';
+            // Replaced stars with Omani Flags 🇴🇲 all over the level
+            for (let x = 180; x < LEVEL_WIDTH - 400; x += 75) {
+                let yPos = groundY - 50;
+                let nearPlat = floatPlats.find(p => x >= p.x && x <= p.x + p.w);
+                if (nearPlat) yPos = nearPlat.y - 50;
 
-        const optionsContainer = document.getElementById('quizOptions');
-        optionsContainer.innerHTML = '';
+                collectibles.push({
+                    x: x,
+                    y: yPos,
+                    size: 28,
+                    type: 'flag',
+                    collected: false
+                });
+            }
 
-        qData.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
-            btn.onclick = () => answerQuiz(idx, btn);
-            optionsContainer.appendChild(btn);
+            // 5 Question Gates placed slightly higher (groundY - 145) for crystal-clear visibility
+            const qPositions = [500, 1200, 1850, 2600, 3150];
+            qPositions.forEach((xPos, idx) => {
+                questionGates.push({
+                    id: idx,
+                    x: xPos,
+                    y: groundY - 145,
+                    width: 65,
+                    height: 85,
+                    solved: false
+                });
+            });
+
+            // End Castle Gate
+            endGate = {
+                x: LEVEL_WIDTH - 280,
+                y: groundY - 150,
+                width: 140,
+                height: 150
+            };
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (gameState === 'START') buildLevel();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        /* ==========================================================================
+           5. CONTROLS
+           ========================================================================== */
+        window.addEventListener('keydown', (e) => {
+            if (gameState !== 'PLAYING') return;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w' || e.key === 'W') {
+                if (player.isGrounded) {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                    playSound('jump');
+                    createSparkle(player.x + player.width/2, player.y + player.height, '#facc15');
+                }
+            }
         });
 
-        updateHUD();
-        document.getElementById('quizScreen').classList.remove('hidden');
-    }
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+        });
 
-    function answerQuiz(selectedIndex, selectedButton) {
-        const qData = questions[activeBlock.questionIndex];
-        const buttons = [...document.querySelectorAll('.option-btn')];
-        buttons.forEach(b => b.disabled = true);
+        function setupTouchControls() {
+            const btnLeft = document.getElementById('btn-left');
+            const btnRight = document.getElementById('btn-right');
+            const btnJump = document.getElementById('btn-jump');
 
-        if (selectedIndex === qData.answer) {
-            score++;
-            answeredCount++;
-            selectedButton.classList.add('correct');
-            document.getElementById('feedback').textContent = 'إجابة صحيحة! أحسنت، تابِع المغامرة ⭐';
-            playSound('correct');
-            activeBlock.hit = true;
-            addParticles(activeBlock.x + activeBlock.width / 2, activeBlock.y + activeBlock.height / 2, '#FFD700');
-        } else {
-            selectedButton.classList.add('wrong');
-            document.getElementById('feedback').textContent = `ليست الإجابة الصحيحة. الإجابة الصحيحة: ${qData.options[qData.answer]}`;
-            buttons[qData.answer].classList.add('correct');
-            playSound('hitBlock');
+            const bindBtn = (el, action) => {
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); action(true); });
+                el.addEventListener('touchend', (e) => { e.preventDefault(); action(false); });
+                el.addEventListener('mousedown', () => action(true));
+                el.addEventListener('mouseup', () => action(false));
+            };
+
+            bindBtn(btnLeft, (val) => keys.left = val);
+            bindBtn(btnRight, (val) => keys.right = val);
+
+            const doJump = (e) => {
+                if (e) e.preventDefault();
+                if (gameState === 'PLAYING' && player.isGrounded) {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                    playSound('jump');
+                    createSparkle(player.x + player.width/2, player.y + player.height, '#facc15');
+                }
+            };
+            btnJump.addEventListener('touchstart', doJump);
+            btnJump.addEventListener('mousedown', doJump);
+        }
+        setupTouchControls();
+
+        /* ==========================================================================
+           6. GAMEPLAY LOOP & QUIZ SYSTEM
+           ========================================================================== */
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('victory-modal').classList.add('hidden');
+            score = 0;
+            activeQuestionIndex = 0;
+            lastSafeX = 100;
+            lastSafeY = canvas.height - 180;
+
+            player.x = lastSafeX;
+            player.y = lastSafeY;
+            player.vx = 0;
+            player.vy = 0;
+
+            buildLevel();
+            updateHUD();
+            gameState = 'PLAYING';
+            playSound('star');
         }
 
-        updateHUD();
+        function updateHUD() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('question-progress').innerText = `${activeQuestionIndex} / 5`;
+            document.getElementById('question-progress-mobile').innerText = `${activeQuestionIndex}/5`;
+        }
 
-        setTimeout(() => {
-            document.getElementById('quizScreen').classList.add('hidden');
-            container.focus();
-            gameState = 'PLAYING';
-        }, 900);
-    }
+        function update() {
+            if (gameState !== 'PLAYING') return;
 
-    // التحديث بفيزياء ثابتة
-    function update() {
-        globalFrame++;
-
-        if (gameState === 'PLAYING') {
-            // حركة ثابتة بدون انزلاق
-            if (keys.right) {
-                player.x += player.speed;
-                player.facing = 'right';
-            } else if (keys.left) {
-                player.x -= player.speed;
+            // Movement
+            if (keys.left) {
+                player.vx = -player.speed;
                 player.facing = 'left';
+            } else if (keys.right) {
+                player.vx = player.speed;
+                player.facing = 'right';
+            } else {
+                player.vx *= 0.7;
             }
 
-            // الجاذبية
+            player.x += player.vx;
+            if (player.x < 0) player.x = 0;
+            if (player.x > LEVEL_WIDTH - player.width) player.x = LEVEL_WIDTH - player.width;
+
+            // Gravity
             player.vy += player.gravity;
             player.y += player.vy;
+            player.isGrounded = false;
 
-            if (player.x < 0) player.x = 0;
+            // Platform collision
+            platforms.forEach(p => {
+                if (player.x + player.width > p.x &&
+                    player.x < p.x + p.width &&
+                    player.y + player.height >= p.y &&
+                    player.y + player.height - player.vy <= p.y + 14 &&
+                    player.vy >= 0) {
 
-            // الوقوف المباشر على الأرضية الثابتة
-            if (player.y + player.height >= groundY) {
-                player.y = groundY - player.height;
-                player.vy = 0;
-                player.grounded = true;
-            }
-
-            // الصعود على الأحجار والمنصات المرتفعة.
-            const terrainObjects = [...stones, ...platforms];
-            player.grounded = false;
-
-            terrainObjects.forEach(s => {
-                const overlapsX = player.x + player.width > s.x && player.x < s.x + s.width;
-                const feet = player.y + player.height;
-                const landing = feet >= s.y && feet <= s.y + 18 && player.vy >= 0;
-
-                if (overlapsX && landing) {
-                    player.y = s.y - player.height;
+                    player.y = p.y - player.height;
                     player.vy = 0;
-                    player.grounded = true;
+                    player.isGrounded = true;
+
+                    // Update last safe ground position for fall recovery
+                    lastSafeX = player.x;
+                    lastSafeY = player.y;
                 }
             });
 
-            // الأرضية الرئيسية تظل آخر طبقة أمان للحركة.
-            if (player.y + player.height >= groundY) {
-                player.y = groundY - player.height;
+            // Smooth kid-friendly fall recovery (No Game Over!)
+            if (player.y > canvas.height + 60) {
+                player.x = lastSafeX;
+                player.y = lastSafeY - 10;
+                player.vx = 0;
                 player.vy = 0;
-                player.grounded = true;
+                showToast("✨ أعدت البداية بكل سهولة!");
             }
 
-            // ضرب الصناديق بسهولة
-            blocks.forEach(b => {
-                if (b.bounceY < 0) b.bounceY += 1;
-
-                if (player.x + player.width * 0.7 > b.x &&
-                    player.x + player.width * 0.3 < b.x + b.width &&
-                    player.y <= b.y + b.height &&
-                    player.y >= b.y + b.height - 15) {
-                    
-                    player.y = b.y + b.height;
-                    player.vy = 2;
-                    b.bounceY = -8;
-
-                    if (!b.hit) {
-                        playSound('hitBlock');
-                        triggerQuiz(b);
+            // Collectibles logic
+            collectibles.forEach(item => {
+                if (!item.collected) {
+                    let dx = (player.x + player.width/2) - item.x;
+                    let dy = (player.y + player.height/2) - item.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < player.width/2 + item.size/2) {
+                        item.collected = true;
+                        score += 10;
+                        playSound('star');
+                        createSparkle(item.x, item.y, '#f59e0b');
+                        updateHUD();
                     }
                 }
             });
 
-            // خط النهاية
-            if (player.x + player.width >= finishLine.flagX) {
-                gameState = 'VICTORY_SEQUENCE';
-                player.x = finishLine.flagX - player.width / 2;
+            // Question Gate Collision
+            questionGates.forEach(gate => {
+                if (!gate.solved) {
+                    if (player.x + player.width > gate.x &&
+                        player.x < gate.x + gate.width &&
+                        player.y + player.height > gate.y &&
+                        player.y < gate.y + gate.height) {
+
+                        triggerQuizModal(gate);
+                    }
+                }
+            });
+
+            // End Gate Victory Trigger
+            if (player.x + player.width > endGate.x + 30) {
+                triggerVictory();
             }
 
-            // متابعة الكاميرا
-            cameraX = player.x - canvas.width / 3;
+            // Continuous fireworks update on victory
+            updateFireworks();
+
+            // Smooth Parallax Camera
+            let targetCamX = player.x - canvas.width * 0.35;
+            cameraX += (targetCamX - cameraX) * 0.08;
             if (cameraX < 0) cameraX = 0;
-            if (cameraX > worldWidth - canvas.width) cameraX = worldWidth - canvas.width;
-        } 
-        else if (gameState === 'VICTORY_SEQUENCE') {
-            if (finishLine.flagSlideY < groundY - 95) {
-                finishLine.flagSlideY += 3;
-                player.y = finishLine.flagSlideY;
-            } else {
-                player.x += 3;
-                player.facing = 'right';
-                if (player.x >= finishLine.fortX + 100) {
-                    gameState = 'WIN';
-                    document.getElementById('finalScore').textContent = score;
-                    document.getElementById('winScreen').classList.remove('hidden');
+            if (cameraX > LEVEL_WIDTH - canvas.width) cameraX = LEVEL_WIDTH - canvas.width;
+
+            // Particles update
+            updateParticles();
+        }
+
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const targetY = 80 + Math.random() * (canvas.height * 0.4);
+            fireworks.push({
+                x: x,
+                y: canvas.height,
+                targetY: targetY,
+                color: ['#dc2626', '#10b981', '#facc15', '#ffffff', '#38bdf8', '#f97316'][Math.floor(Math.random() * 6)],
+                speed: 7 + Math.random() * 5,
+                exploded: false
+            });
+        }
+
+        function updateFireworks() {
+            if (gameState === 'VICTORY' && Math.random() < 0.15) {
+                createFirework();
+            }
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                let f = fireworks[i];
+                if (!f.exploded) {
+                    f.y -= f.speed;
+                    // Firework trail sparkles
+                    particles.push({
+                        x: f.x,
+                        y: f.y,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: Math.random() * 2 + 1,
+                        size: 3,
+                        color: '#fef08a',
+                        life: 12
+                    });
+
+                    if (f.y <= f.targetY) {
+                        f.exploded = true;
+                        playSound('star');
+                        // Explode in vivid radial burst
+                        const count = 40 + Math.floor(Math.random() * 25);
+                        for (let j = 0; j < count; j++) {
+                            const angle = (Math.PI * 2 / count) * j + Math.random() * 0.1;
+                            const speed = 2 + Math.random() * 6;
+                            particles.push({
+                                x: f.x,
+                                y: f.y,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: Math.random() * 5 + 3,
+                                color: f.color,
+                                life: 45 + Math.floor(Math.random() * 20),
+                                gravity: 0.12
+                            });
+                        }
+                    }
+                } else {
+                    fireworks.splice(i, 1);
                 }
             }
         }
 
-        // الجسيمات
-        particles.forEach((p, idx) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
-            if (p.life <= 0) particles.splice(idx, 1);
-        });
+        function triggerQuizModal(gate) {
+            gameState = 'QUIZ';
+            pendingGate = gate;
+            const qData = quizQuestions[activeQuestionIndex % quizQuestions.length];
 
-        if (gameState === 'WIN' || gameState === 'VICTORY_SEQUENCE') {
-            if (Math.random() < 0.1) createFirework();
-            fireworks.forEach((f, idx) => {
-                f.x += f.vx;
-                f.y += f.vy;
-                f.life--;
-                if (f.life <= 0) fireworks.splice(idx, 1);
+            document.getElementById('modal-q-number').innerText = `السؤال ${activeQuestionIndex + 1} من 5`;
+            document.getElementById('modal-q-text').innerText = qData.q;
+            document.getElementById('feedback-msg').innerText = '';
+
+            const optsContainer = document.getElementById('modal-options');
+            optsContainer.innerHTML = '';
+
+            qData.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full py-4 px-5 bg-amber-400 hover:bg-amber-300 border-4 border-amber-600 text-slate-900 font-black text-xl md:text-2xl rounded-2xl transition shadow-lg active:scale-95 flex items-center justify-between";
+                btn.innerHTML = `<span>${optText}</span><span class="text-3xl">👉</span>`;
+                btn.onclick = () => checkQuizAnswer(idx, qData.correct, btn);
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+
+        function checkQuizAnswer(selectedIdx, correctIdx, btnEl) {
+            if (selectedIdx === correctIdx) {
+                playSound('correct');
+                btnEl.className = "w-full py-4 px-5 bg-emerald-500 border-4 border-emerald-700 text-white font-black text-xl md:text-2xl rounded-2xl shadow-lg flex items-center justify-between";
+                btnEl.innerHTML = `<span>${btnEl.innerText}</span><span class="text-3xl">🎉</span>`;
+                
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 animate-pulse">🎉 أحسنت! إجابة صحيحة ⭐</span>`;
+
+                setTimeout(() => {
+                    score += 50;
+                    activeQuestionIndex++;
+                    if (pendingGate) pendingGate.solved = true;
+                    updateHUD();
+                    document.getElementById('quiz-modal').classList.add('hidden');
+                    gameState = 'PLAYING';
+                    showToast("🎉 ممتاز! واصل المغامرة الرائعة!");
+                }, 1100);
+            } else {
+                playSound('retry');
+                btnEl.className = "w-full py-4 px-5 bg-amber-200 border-4 border-amber-400 text-amber-900 font-black text-xl md:text-2xl rounded-2xl flex items-center justify-between opacity-80";
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-amber-700">😊 حاول مرة أخرى!</span>`;
+            }
+        }
+
+        function triggerVictory() {
+            if (gameState === 'VICTORY') return;
+            gameState = 'VICTORY';
+            playSound('victory');
+
+            const collectedFlags = collectibles.filter(c => c.collected).length;
+            document.getElementById('final-flags-count').innerText = `${collectedFlags} 🇴🇲`;
+            document.getElementById('final-quiz-count').innerText = `${activeQuestionIndex} / 5 ❓`;
+            document.getElementById('final-score').innerText = score;
+            
+            document.getElementById('victory-modal').classList.remove('hidden');
+            
+            // Initial celebratory fireworks burst
+            for (let i = 0; i < 8; i++) {
+                setTimeout(createFirework, i * 200);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2200);
+        }
+
+        function createSparkle(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    size: Math.random() * 6 + 3,
+                    color: color,
+                    life: 25
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.gravity) p.vy += p.gravity;
+                p.life--;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+        }
+
+        /* ==========================================================================
+           7. CANVAS RENDERING ENGINE
+           ========================================================================== */
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // A. BACKGROUND
+            drawBackground();
+
+            // B. PLATFORMS
+            drawPlatforms();
+
+            // C. QUESTION GATES
+            drawQuestionGates();
+
+            // D. COLLECTIBLES
+            drawCollectibles();
+
+            // E. END CASTLE
+            drawEndCastle();
+
+            // F. PLAYER CHARACTER
+            drawPlayer();
+
+            // G. PARTICLES & FIREWORKS
+            drawParticles();
+        }
+
+        function drawBackground() {
+            if (customBgImg && customBgImg.complete && customBgImg.naturalWidth > 0) {
+                let bgW = canvas.width;
+                let bgOffset = -(cameraX * 0.3) % bgW;
+                ctx.drawImage(customBgImg, bgOffset, 0, bgW, canvas.height);
+                ctx.drawImage(customBgImg, bgOffset + bgW, 0, bgW, canvas.height);
+                return;
+            }
+
+            // Cheerful Cartoon Omani Sky & Mountains
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGrad.addColorStop(0, '#38bdf8');
+            skyGrad.addColorStop(0.7, '#bae6fd');
+            skyGrad.addColorStop(1, '#fef08a');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Sun
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.arc(canvas.width - 120, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Festive Omani Mountain Hills
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            for (let i = 0; i <= canvas.width + 100; i += 100) {
+                let worldX = i + cameraX * 0.2;
+                let mY = canvas.height - 160 - Math.sin(worldX * 0.003) * 60;
+                ctx.lineTo(i, mY);
+            }
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
+
+            ctx.fillStyle = '#0369a1';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            for (let i = 0; i <= canvas.width + 80; i += 80) {
+                let worldX = i + cameraX * 0.4;
+                let mY = canvas.height - 110 - Math.cos(worldX * 0.005) * 40;
+                ctx.lineTo(i, mY);
+            }
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
+        }
+
+        function drawPlatforms() {
+            platforms.forEach(p => {
+                let screenX = p.x - cameraX;
+                if (screenX + p.width < -50 || screenX > canvas.width + 50) return;
+
+                if (!p.type) {
+                    // Main Ground (Red & Emerald Omani colors accents)
+                    ctx.fillStyle = '#15803d'; // Emerald green top
+                    ctx.fillRect(screenX, p.y, p.width, 16);
+
+                    ctx.fillStyle = '#b45309'; // Warm terracotta stone
+                    ctx.fillRect(screenX, p.y + 16, p.width, p.height - 16);
+
+                    // Decorative flag trim
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(screenX, p.y, p.width, 4);
+                } else {
+                    // Kid Cloud Floating Platform
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.roundRect(screenX, p.y, p.width, p.height, 14);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                }
             });
         }
-    }
 
-    // الرسم
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawQuestionGates() {
+            questionGates.forEach(gate => {
+                let screenX = gate.x - cameraX;
+                if (screenX + gate.width < -50 || screenX > canvas.width + 50) return;
 
-        // الخلفية
-        if (bgImage.complete && bgImage.naturalWidth !== 0) {
-            let bgX = -(cameraX * 0.3) % canvas.width;
-            ctx.drawImage(bgImage, bgX, 0, canvas.width, canvas.height);
-            ctx.drawImage(bgImage, bgX + canvas.width, 0, canvas.width, canvas.height);
-        } else {
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (!gate.solved) {
+                    let floatY = gate.y + Math.sin(Date.now() * 0.005 + gate.id) * 8;
+
+                    // Elevated Glowing Gift Question Gate Block
+                    ctx.fillStyle = '#dc2626';
+                    ctx.beginPath();
+                    ctx.roundRect(screenX, floatY, gate.width, gate.height, 18);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+
+                    // Inner Glow ring
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 38px Cairo';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('❓', screenX + gate.width/2, floatY + 54);
+                }
+            });
         }
 
-        ctx.save();
-        ctx.translate(-Math.floor(cameraX), 0);
+        function drawCollectibles() {
+            collectibles.forEach(item => {
+                if (item.collected) return;
+                let screenX = item.x - cameraX;
+                if (screenX < -50 || screenX > canvas.width + 50) return;
 
-        // 1. تضاريس الأرض الرئيسية: طبقات تربة + عشب + تفاصيل صخرية.
-        ctx.fillStyle = '#36513d';
-        ctx.fillRect(0, groundY, worldWidth, 18);
+                let floatY = item.y + Math.sin(Date.now() * 0.006 + item.x) * 6;
 
-        ctx.fillStyle = '#5b4636';
-        ctx.fillRect(0, groundY + 18, worldWidth, canvas.height - groundY - 18);
-
-        // تموجات التربة لإعطاء عمق بصري.
-        for (let x = 0; x < worldWidth; x += 95) {
-            ctx.strokeStyle = 'rgba(30,20,15,.20)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(x, groundY + 36);
-            ctx.quadraticCurveTo(x + 22, groundY + 29, x + 45, groundY + 39);
-            ctx.quadraticCurveTo(x + 65, groundY + 49, x + 88, groundY + 38);
-            ctx.stroke();
-        }
-
-        // شجيرات ونباتات صغيرة على امتداد الطريق.
-        for (let x = 80; x < worldWidth; x += 210) {
-            const sway = Math.sin((x + globalFrame * 0.7) * 0.02) * 2;
-            ctx.strokeStyle = '#274c37';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(x, groundY);
-            ctx.lineTo(x + sway, groundY - 22);
-            ctx.stroke();
-            ctx.fillStyle = '#397a4d';
-            ctx.beginPath();
-            ctx.arc(x - 7 + sway, groundY - 24, 8, 0, Math.PI * 2);
-            ctx.arc(x + 7 + sway, groundY - 28, 9, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // 2. منصات القفز المرتفعة.
-        platforms.forEach((p, i) => {
-            ctx.fillStyle = '#7b5a43';
-            ctx.beginPath();
-            ctx.roundRect(p.x, p.y, p.width, p.height, 8);
-            ctx.fill();
-
-            ctx.fillStyle = '#3f6d45';
-            ctx.beginPath();
-            ctx.roundRect(p.x, p.y - 5, p.width, 9, 5);
-            ctx.fill();
-
-            // حواف صخرية صغيرة أسفل المنصة.
-            for (let x = p.x + 12; x < p.x + p.width - 8; x += 24) {
-                ctx.fillStyle = '#665040';
+                // Glowing halo around Oman flag
+                ctx.fillStyle = 'rgba(254, 240, 138, 0.45)';
                 ctx.beginPath();
-                ctx.moveTo(x, p.y + p.height);
-                ctx.lineTo(x + 9, p.y + p.height + 12);
-                ctx.lineTo(x + 18, p.y + p.height);
-                ctx.closePath();
-                ctx.fill();
-            }
-        });
-
-        // 3. الأحجار
-        stones.forEach((s, i) => {
-            const r = 12;
-            ctx.fillStyle = i % 2 ? '#77665a' : '#8d7768';
-            ctx.beginPath();
-            ctx.moveTo(s.x + r, s.y);
-            ctx.lineTo(s.x + s.width - r, s.y);
-            ctx.quadraticCurveTo(s.x + s.width, s.y, s.x + s.width, s.y + r);
-            ctx.lineTo(s.x + s.width - 8, s.y + s.height - 5);
-            ctx.quadraticCurveTo(s.x + s.width / 2, s.y + s.height + 5, s.x + 7, s.y + s.height - 4);
-            ctx.lineTo(s.x, s.y + r);
-            ctx.quadraticCurveTo(s.x, s.y, s.x + r, s.y);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.strokeStyle = 'rgba(42,31,25,.65)';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            ctx.fillStyle = 'rgba(255,255,255,.10)';
-            ctx.beginPath();
-            ctx.ellipse(s.x + s.width * .35, s.y + 8, s.width * .2, 5, 0, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        // 3. صناديق الأسئلة الكبيرة والسهلة
-        blocks.forEach(b => {
-            let drawY = b.y + b.bounceY;
-
-            if (!b.hit) {
-                // مؤشر بصري بسيط يوضح أن الصندوق يحتاج قفزة.
-                ctx.fillStyle = 'rgba(246,201,69,.18)';
-                ctx.beginPath();
-                ctx.arc(b.x + b.width / 2, drawY + b.height / 2, 42 + Math.sin(globalFrame * .08) * 4, 0, Math.PI * 2);
+                ctx.arc(screenX, floatY - 8, 22, 0, Math.PI * 2);
                 ctx.fill();
 
-                // سلسلة صغيرة تحت الصندوق توضح أنه هدف القفز.
-                ctx.strokeStyle = 'rgba(246,201,69,.7)';
-                ctx.lineWidth = 3;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.moveTo(b.x + b.width/2, drawY + b.height);
-                ctx.lineTo(b.x + b.width/2, drawY + b.height + 34);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                ctx.fillStyle = '#FFD700';
-                ctx.beginPath();
-                ctx.roundRect(b.x, drawY, b.width, b.height, 10);
-                ctx.fill();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#FFA500';
-                ctx.stroke();
-
-                ctx.fillStyle = '#D62612';
-                ctx.font = '900 32px Tajawal';
+                // Oman Flag or Star collectible
+                ctx.font = '30px Cairo';
                 ctx.textAlign = 'center';
-                ctx.fillText('؟', b.x + b.width / 2, drawY + 38);
+                ctx.fillText(item.type === 'flag' ? '🇴🇲' : '⭐', screenX, floatY);
+            });
+        }
+
+        function drawEndCastle() {
+            let screenX = endGate.x - cameraX;
+            if (screenX + endGate.width < -200 || screenX > canvas.width + 200) return;
+
+            const cX = screenX;
+            const cY = endGate.y - 30; 
+            const cW = endGate.width + 40;
+            const cH = endGate.height + 30;
+
+            ctx.save();
+
+            // Shadow under castle
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+            ctx.beginPath();
+            ctx.ellipse(cX + cW/2, cY + cH, cW/2 + 20, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main Central Fortress Wall (Omani Sandstone)
+            let wallGrad = ctx.createLinearGradient(cX, cY, cX + cW, cY);
+            wallGrad.addColorStop(0, '#d97706');
+            wallGrad.addColorStop(0.5, '#f59e0b');
+            wallGrad.addColorStop(1, '#b45309');
+
+            ctx.fillStyle = wallGrad;
+            ctx.beginPath();
+            ctx.roundRect(cX + 20, cY + 30, cW - 40, cH - 30, [12, 12, 0, 0]);
+            ctx.fill();
+
+            // Side Round Fort Turrets (Nizwa style)
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.roundRect(cX - 12, cY + 10, 48, cH - 10, [16, 16, 0, 0]);
+            ctx.fill();
+
+            ctx.fillStyle = '#92400e';
+            ctx.beginPath();
+            ctx.roundRect(cX + cW - 36, cY + 10, 48, cH - 10, [16, 16, 0, 0]);
+            ctx.fill();
+
+            // Traditional Omani Wall Battlements / Crenellations
+            const drawCrenellations = (x, y, width) => {
+                ctx.fillStyle = '#78350f';
+                const count = 5;
+                const step = width / count;
+                for (let i = 0; i < count; i++) {
+                    if (i % 2 === 0) {
+                        ctx.fillRect(x + i * step, y - 10, step, 10);
+                    }
+                }
+            };
+            drawCrenellations(cX - 12, cY + 10, 48);
+            drawCrenellations(cX + cW - 36, cY + 10, 48);
+            drawCrenellations(cX + 20, cY + 30, cW - 40);
+
+            // Arched Loophole Windows
+            ctx.fillStyle = '#451a03';
+            ctx.beginPath();
+            ctx.arc(cX + 12, cY + 45, 6, Math.PI, 0);
+            ctx.fillRect(cX + 6, cY + 45, 12, 14);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cX + cW - 12, cY + 45, 6, Math.PI, 0);
+            ctx.fillRect(cX + cW - 18, cY + 45, 12, 14);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cX + cW/2 - 25, cY + 55, 7, Math.PI, 0);
+            ctx.fillRect(cX + cW/2 - 32, cY + 55, 14, 16);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cX + cW/2 + 25, cY + 55, 7, Math.PI, 0);
+            ctx.fillRect(cX + cW/2 + 18, cY + 55, 14, 16);
+            ctx.fill();
+
+            // Grand Omani Fort Arch Wooden Gate
+            const doorX = cX + cW/2 - 28;
+            const doorY = cY + cH - 60;
+            const doorW = 56;
+            const doorH = 60;
+
+            // Outer Arch Frame
+            ctx.fillStyle = '#78350f';
+            ctx.beginPath();
+            ctx.arc(cX + cW/2, doorY, doorW/2 + 6, Math.PI, 0);
+            ctx.fillRect(doorX - 6, doorY, doorW + 12, doorH);
+            ctx.fill();
+
+            // Wooden Door Base
+            ctx.fillStyle = '#451a03';
+            ctx.beginPath();
+            ctx.arc(cX + cW/2, doorY, doorW/2, Math.PI, 0);
+            ctx.fillRect(doorX, doorY, doorW, doorH);
+            ctx.fill();
+
+            // Brass Studs & Center Planks
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cX + cW/2, doorY - doorW/2);
+            ctx.lineTo(cX + cW/2, doorY + doorH);
+            ctx.stroke();
+
+            ctx.fillStyle = '#facc15';
+            [doorY + 10, doorY + 25, doorY + 42].forEach(sy => {
+                ctx.beginPath();
+                ctx.arc(doorX + 12, sy, 2.5, 0, Math.PI * 2);
+                ctx.arc(doorX + doorW - 12, sy, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Waving Flags atop Castle Towers & Dome
+            ctx.font = '36px Cairo';
+            ctx.textAlign = 'center';
+            ctx.fillText('🇴🇲', cX + 12, cY - 12);
+            ctx.fillText('🇴🇲', cX + cW - 12, cY - 12);
+            ctx.font = '48px Cairo';
+            ctx.fillText('🇴🇲', cX + cW/2, cY + 5);
+
+            ctx.restore();
+        }
+
+        function drawPlayer() {
+            let screenX = player.x - cameraX;
+            let drawY = player.y;
+
+            // Subtle running bounce
+            if (Math.abs(player.vx) > 0.5 && player.isGrounded) {
+                drawY += Math.sin(Date.now() * 0.015) * 3;
+            }
+
+            ctx.save();
+
+            // Mirror character sprite when moving left
+            if (player.facing === 'left') {
+                ctx.translate(screenX + player.width, drawY);
+                ctx.scale(-1, 1);
+                screenX = 0;
+                drawY = 0;
+            }
+
+            if (charImage.complete && charImage.naturalWidth > 0) {
+                // Draw provided character sprite image
+                ctx.drawImage(charImage, screenX, drawY, player.width, player.height);
             } else {
-                ctx.fillStyle = '#90A4AE';
+                // Fallback charming Omani child avatar
+                ctx.fillStyle = '#dc2626';
                 ctx.beginPath();
-                ctx.roundRect(b.x, drawY, b.width, b.height, 10);
+                ctx.roundRect(screenX + 6, drawY + 22, player.width - 12, player.height - 22, 12);
                 ctx.fill();
 
-                ctx.fillStyle = '#FFF';
-                ctx.font = '900 28px Tajawal';
-                ctx.textAlign = 'center';
-                ctx.fillText('✓', b.x + b.width / 2, drawY + 36);
-            }
-        });
+                ctx.fillStyle = '#fbcfe8';
+                ctx.beginPath();
+                ctx.arc(screenX + player.width/2, drawY + 16, 14, 0, Math.PI * 2);
+                ctx.fill();
 
-        // 4. القلعة العُمانية: أبراج وبوابة وأقواس بشكل أوضح.
-        const fx = finishLine.fortX;
-        const fy = finishLine.fortY;
-        const fw = finishLine.fortWidth;
-        const fh = finishLine.fortHeight;
-
-        // جسم القلعة.
-        ctx.fillStyle = '#d9c4a8';
-        ctx.fillRect(fx, fy + 35, fw, fh - 35);
-
-        // البرجان الجانبيان.
-        [fx - 38, fx + fw - 38].forEach(tx => {
-            ctx.fillStyle = '#c9ae8d';
-            ctx.fillRect(tx, fy - 35, 76, fh + 35);
-
-            // شرفات البرج.
-            ctx.fillStyle = '#a98d6e';
-            for (let i = 0; i < 4; i++) {
-                ctx.fillRect(tx + 6 + i * 18, fy - 48, 11, 16);
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(screenX + player.width/2 - 12, drawY + 2, 24, 8);
             }
 
-            // فتحات البرج.
-            ctx.fillStyle = '#604b3c';
-            ctx.beginPath();
-            ctx.arc(tx + 38, fy + 45, 10, Math.PI, 0);
-            ctx.fill();
-            ctx.fillRect(tx + 28, fy + 45, 20, 22);
-        });
-
-        // شرفات السطح.
-        ctx.fillStyle = '#b89b78';
-        for (let x = fx + 8; x < fx + fw - 8; x += 28) {
-            ctx.fillRect(x, fy + 20, 17, 17);
+            ctx.restore();
         }
 
-        // بوابة مقوسة.
-        ctx.fillStyle = '#5b4030';
-        ctx.beginPath();
-        ctx.arc(fx + fw / 2, fy + fh, 48, Math.PI, 0);
-        ctx.fill();
-        ctx.fillRect(fx + fw / 2 - 48, fy + fh, 96, 55);
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
 
-        // تفاصيل واجهة القلعة.
-        ctx.fillStyle = '#8e7358';
-        ctx.fillRect(fx + 35, fy + 72, 24, 30);
-        ctx.fillRect(fx + fw - 59, fy + 72, 24, 30);
-
-        // 5. علم سلطنة عُمان بشكل أقرب للعلم الحقيقي:
-        // شريط رأسي أبيض/أحمر/أخضر مع الشرائط الأفقية الأحمر والأبيض والأخضر،
-        // وشعار السلطنة في الجزء العلوي قرب السارية.
-        const poleX = finishLine.flagX;
-        const poleTop = finishLine.flagSlideY;
-        const flagW = 125;
-        const flagH = 75;
-
-        ctx.fillStyle = '#e7e7e7';
-        ctx.fillRect(poleX, finishLine.flagY, 7, finishLine.poleHeight);
-
-        // الجزء الأفقي من العلم.
-        ctx.fillStyle = '#c8102e';
-        ctx.fillRect(poleX + 7, poleTop, flagW - 7, 25);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(poleX + 7, poleTop + 25, flagW - 7, 25);
-        ctx.fillStyle = '#00843d';
-        ctx.fillRect(poleX + 7, poleTop + 50, flagW - 7, 25);
-
-        // الشريط الرأسي عند السارية.
-        ctx.fillStyle = '#c8102e';
-        ctx.fillRect(poleX + 7, poleTop, 30, flagH);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(poleX + 7, poleTop + 25, 30, 25);
-        ctx.fillStyle = '#00843d';
-        ctx.fillRect(poleX + 7, poleTop + 50, 30, 25);
-
-        // شعار السلطنة بصورة رمزية مبسطة وواضحة.
-        ctx.save();
-        ctx.translate(poleX + 22, poleTop + 37);
-        ctx.strokeStyle = '#ffffff';
-        ctx.fillStyle = '#ffffff';
-        ctx.lineWidth = 3;
-        // الخنجر.
-        ctx.beginPath();
-        ctx.moveTo(0, -12);
-        ctx.quadraticCurveTo(7, -5, 0, 10);
-        ctx.quadraticCurveTo(-7, -5, 0, -12);
-        ctx.stroke();
-        ctx.fillRect(-3, 5, 6, 10);
-        // السيفان.
-        ctx.beginPath();
-        ctx.moveTo(-15, 10); ctx.lineTo(-7, -8);
-        ctx.moveTo(15, 10); ctx.lineTo(7, -8);
-        ctx.stroke();
-        ctx.restore();
-
-        // 6. الجسيمات والألعاب النارية
-        particles.forEach(p => {
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        // 7. الشخصية
-        ctx.save();
-        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-        if (player.facing === 'left') ctx.scale(-1, 1);
-
-        if (playerImage.complete && playerImage.naturalWidth !== 0) {
-            ctx.drawImage(playerImage, -player.width / 2, -player.height / 2, player.width, player.height);
-        } else {
-            ctx.fillStyle = '#D62612';
-            ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
+            // Draw ascending firework rockets
+            fireworks.forEach(f => {
+                if (!f.exploded) {
+                    ctx.fillStyle = f.color;
+                    ctx.beginPath();
+                    ctx.arc(f.x - cameraX, f.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
         }
-        ctx.restore();
 
-        fireworks.forEach(f => {
-            ctx.fillStyle = f.color;
-            ctx.beginPath();
-            ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
 
-        ctx.restore();
-
-        // لمسة بصرية احترافية: تدرج خفيف على أطراف المشهد
-        const vignette = ctx.createRadialGradient(
-            canvas.width/2, canvas.height/2, 120,
-            canvas.width/2, canvas.height/2, canvas.width*.72
-        );
-        vignette.addColorStop(0, 'rgba(0,0,0,0)');
-        vignette.addColorStop(1, 'rgba(0,0,0,.22)');
-        ctx.fillStyle = vignette;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function gameLoop() {
-        update();
-        draw();
-        requestAnimationFrame(gameLoop);
-    }
-
-    gameLoop();
-</script>
-
+        window.onload = function() {
+            buildLevel();
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
 </body>
 </html>
-مغامرة_عمان_علم_وقلعة_احترافية.html
-HTML
-علم عمان بشكل صحيح OMAN  وبعض الاسئلة لاتفتح 
-
-It seems like I can’t do more advanced data analysis right now. Please try again later. 
-
-You’re out of data analysis for now. Start a free Plus trial for more, or try again tomorrow after 1:59 AM.
-Try Plus free
