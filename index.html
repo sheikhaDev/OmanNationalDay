@@ -32,6 +32,7 @@
             border-radius: 12px;
             overflow: hidden;
             background: #000;
+            outline: none;
         }
 
         canvas {
@@ -40,7 +41,6 @@
             display: block;
         }
 
-        /* شاشات الواجهة Overlay */
         .overlay {
             position: absolute;
             top: 0;
@@ -95,7 +95,6 @@
             background: linear-gradient(135deg, #D62612, #990000);
         }
 
-        /* نافذة السؤال */
         .quiz-card {
             background: rgba(20, 20, 20, 0.95);
             border: 3px solid #FFD700;
@@ -136,7 +135,6 @@
             border-color: #FFD700;
         }
 
-        /* أزرار التحكم للمس/الجوال */
         #touchControls {
             position: absolute;
             bottom: 15px;
@@ -168,6 +166,7 @@
             color: white;
             user-select: none;
             touch-action: manipulation;
+            cursor: pointer;
         }
 
         .touch-btn:active {
@@ -177,17 +176,15 @@
 </head>
 <body>
 
-<div id="gameContainer">
+<div id="gameContainer" tabindex="0">
     <canvas id="gameCanvas" width="1000" height="550"></canvas>
 
-    <!-- الشاشة الرئيسية -->
     <div id="startScreen" class="overlay">
         <h1>مغامرة العيد الوطني العُماني</h1>
         <p>اجمع الإجابات الصحيحة من صناديق المعرفة (؟) واصل إلى القلعة العُمانية للاحتفال بالعيد الوطني المجيد!</p>
-        <button class="btn" onclick="startGame()">ابدأ اللعب فوراً 🚀</button>
+        <button class="btn" id="startBtn">ابدأ اللعب فوراً 🚀</button>
     </div>
 
-    <!-- نافذة الأسئلة عند ضرب الصندوق -->
     <div id="quizScreen" class="overlay hidden">
         <div class="quiz-card">
             <h2 id="quizQuestion">السؤال هنا؟</h2>
@@ -195,14 +192,12 @@
         </div>
     </div>
 
-    <!-- شاشة الفوز -->
     <div id="winScreen" class="overlay hidden">
         <h1 style="color: #FFD700;">كل عام وعُمان بخير! 🇴🇲</h1>
         <p>لقد أتممت المغامرة بنجاح ووصلت إلى القلعة العُمانية المجيدة!</p>
-        <button class="btn" onclick="restartGame()">إعادة اللعب 🔄</button>
+        <button class="btn" id="restartBtn">إعادة اللعب 🔄</button>
     </div>
 
-    <!-- أزرار اللمس للجوال -->
     <div id="touchControls">
         <div class="touch-group">
             <div class="touch-btn" id="btnLeft">◀</div>
@@ -215,69 +210,71 @@
 </div>
 
 <script>
+    const container = document.getElementById('gameContainer');
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // تحميل الصور الخارجية
     const bgImage = new Image();
-    bgImage.src = '814.webp'; // صورة الخلفية
+    bgImage.src = '814.webp';
 
     const playerImage = new Image();
-    playerImage.src = '813.png'; // صورة الشخصية
+    playerImage.src = '813.png';
 
-    // محرك الصوتيات Web Audio API
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
     function initAudio() {
         if (!audioCtx) {
-            audioCtx = new AudioContext();
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
         }
     }
 
     function playSound(type) {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        if (!audioCtx || audioCtx.state !== 'running') return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-        if (type === 'jump') {
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
-        } else if (type === 'hitBlock') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.08);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
-        } else if (type === 'correct') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.4);
-        } else if (type === 'firework') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(100 + Math.random() * 200, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        }
+            if (type === 'jump') {
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'hitBlock') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'firework') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100 + Math.random() * 200, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        } catch(e) {}
     }
 
-    // أسئلة المسابقة
     const questions = [
         {
             q: "ما هو تاريخ العيد الوطني العُماني؟",
@@ -296,19 +293,14 @@
         }
     ];
 
-    // حالة اللعبة
-    let gameState = 'START'; // START, PLAYING, QUIZ, VICTORY_SEQUENCE, WIN
-    let currentQuizIndex = 0;
+    let gameState = 'START';
     let activeBlock = null;
 
-    // أزرار التحكم
     const keys = { right: false, left: false, up: false };
 
-    // الكاميرا
     let cameraX = 0;
     const worldWidth = 3200;
 
-    // اللاعب
     const player = {
         x: 100,
         y: 300,
@@ -323,25 +315,21 @@
         facing: 'right'
     };
 
-    // المنصات
     const platforms = [
         { x: 0, y: 480, width: 1200, height: 70 },
         { x: 1350, y: 480, width: 1800, height: 70 },
-        // منصات مرتفعة
         { x: 300, y: 350, width: 150, height: 20 },
         { x: 700, y: 320, width: 200, height: 20 },
         { x: 1400, y: 360, width: 180, height: 20 },
         { x: 1800, y: 300, width: 200, height: 20 }
     ];
 
-    // صناديق الأسئلة (ماريو)
     const blocks = [
         { x: 350, y: 220, width: 40, height: 40, hit: false, questionIndex: 0 },
         { x: 780, y: 190, width: 40, height: 40, hit: false, questionIndex: 1 },
         { x: 1880, y: 170, width: 40, height: 40, hit: false, questionIndex: 2 }
     ];
 
-    // نهاية المستوى (السارية والقلعة)
     const finishLine = {
         flagX: 2600,
         flagY: 180,
@@ -353,7 +341,6 @@
         fortHeight: 250
     };
 
-    // الألعاب النارية
     let fireworks = [];
 
     function createFirework() {
@@ -373,11 +360,13 @@
         playSound('firework');
     }
 
-    // إعداد أزرار التحكم
     window.addEventListener('keydown', e => {
-        if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-        if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+            e.preventDefault();
+        }
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
             if (!keys.up && player.grounded && gameState === 'PLAYING') {
                 player.vy = player.jumpPower;
                 player.grounded = false;
@@ -388,15 +377,14 @@
     });
 
     window.addEventListener('keyup', e => {
-        if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
-        if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.up = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = false;
     });
 
-    // أدوات التحكم باللمس
     const setupTouchBtn = (id, keyName) => {
         const btn = document.getElementById(id);
-        btn.addEventListener('touchstart', (e) => {
+        const startAction = (e) => {
             e.preventDefault();
             initAudio();
             if (keyName === 'up' && player.grounded && gameState === 'PLAYING') {
@@ -405,24 +393,30 @@
                 playSound('jump');
             }
             keys[keyName] = true;
-        });
-        btn.addEventListener('touchend', (e) => {
+        };
+        const endAction = (e) => {
             e.preventDefault();
             keys[keyName] = false;
-        });
+        };
+
+        btn.addEventListener('touchstart', startAction);
+        btn.addEventListener('touchend', endAction);
+        btn.addEventListener('mousedown', startAction);
+        btn.addEventListener('mouseup', endAction);
     };
 
     setupTouchBtn('btnLeft', 'left');
     setupTouchBtn('btnRight', 'right');
     setupTouchBtn('btnJump', 'up');
 
-    function startGame() {
+    document.getElementById('startBtn').onclick = () => {
         initAudio();
+        container.focus();
         document.getElementById('startScreen').classList.add('hidden');
         gameState = 'PLAYING';
-    }
+    };
 
-    function restartGame() {
+    document.getElementById('restartBtn').onclick = () => {
         player.x = 100;
         player.y = 300;
         player.vx = 0;
@@ -432,10 +426,10 @@
         blocks.forEach(b => b.hit = false);
         fireworks = [];
         document.getElementById('winScreen').classList.add('hidden');
+        container.focus();
         gameState = 'PLAYING';
-    }
+    };
 
-    // فتح شاشة السؤال
     function triggerQuiz(block) {
         gameState = 'QUIZ';
         activeBlock = block;
@@ -462,16 +456,15 @@
             playSound('correct');
             activeBlock.hit = true;
             document.getElementById('quizScreen').classList.add('hidden');
+            container.focus();
             gameState = 'PLAYING';
         } else {
             alert('إجابة خاطئة! حاول مرة أخرى.');
         }
     }
 
-    // تحديث الحركة والفيزياء
     function update() {
         if (gameState === 'PLAYING') {
-            // حركة اللاعب أفقياً
             if (keys.right) {
                 player.vx = player.speed;
                 player.facing = 'right';
@@ -482,20 +475,13 @@
                 player.vx = 0;
             }
 
-            // الجاذبية
             player.vy += player.gravity;
-
-            // تطبيق السرعة
             player.x += player.vx;
             player.y += player.vy;
 
-            // الحدود العالمية
             if (player.x < 0) player.x = 0;
-
-            // إعادة تعيين حالة الأرضية
             player.grounded = false;
 
-            // التصادم مع المنصات
             platforms.forEach(p => {
                 if (player.x + player.width > p.x &&
                     player.x < p.x + p.width &&
@@ -507,7 +493,6 @@
                 }
             });
 
-            // التصادم مع صناديق الأسئلة (من الأسفل)
             blocks.forEach(b => {
                 if (player.x + player.width > b.x &&
                     player.x < b.x + b.width &&
@@ -523,7 +508,6 @@
                 }
             });
 
-            // السقوط في الحفرة
             if (player.y > canvas.height + 100) {
                 player.x = 100;
                 player.y = 300;
@@ -531,24 +515,20 @@
                 player.vy = 0;
             }
 
-            // الوصول لخط النهاية (سارية العلم)
             if (player.x + player.width >= finishLine.flagX) {
                 gameState = 'VICTORY_SEQUENCE';
                 player.x = finishLine.flagX - player.width / 2;
             }
 
-            // تحديث موضع الكاميرا
             cameraX = player.x - canvas.width / 3;
             if (cameraX < 0) cameraX = 0;
             if (cameraX > worldWidth - canvas.width) cameraX = worldWidth - canvas.width;
         } 
         else if (gameState === 'VICTORY_SEQUENCE') {
-            // انزلاق علم عُمان والشخصية
             if (finishLine.flagSlideY < finishLine.flagY + finishLine.poleHeight - 50) {
                 finishLine.flagSlideY += 3;
                 player.y = finishLine.flagSlideY;
             } else {
-                // الحركة نحو القلعة
                 player.x += 3;
                 player.facing = 'right';
                 if (player.x >= finishLine.fortX + 100) {
@@ -558,7 +538,6 @@
             }
         }
 
-        // تحديث الألعاب النارية
         if (gameState === 'WIN' || gameState === 'VICTORY_SEQUENCE') {
             if (Math.random() < 0.1) createFirework();
             fireworks.forEach((f, index) => {
@@ -570,18 +549,14 @@
         }
     }
 
-    // دالة الرسم الرئيسية
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. رسم صورة الخلفية (تتحرك بطريقة البارالاكس)
         if (bgImage.complete && bgImage.naturalWidth !== 0) {
-            // رسم صورتين بجانب بعضهما للحصول على خلفية مستمرة عند الحركة
             let bgX = -(cameraX * 0.3) % canvas.width;
             ctx.drawImage(bgImage, bgX, 0, canvas.width, canvas.height);
             ctx.drawImage(bgImage, bgX + canvas.width, 0, canvas.width, canvas.height);
         } else {
-            // خلفية احتياطية في حال عدم تحميل الصورة
             ctx.fillStyle = '#87CEEB';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -589,17 +564,13 @@
         ctx.save();
         ctx.translate(-cameraX, 0);
 
-        // 2. رسم المنصات
         platforms.forEach(p => {
-            // سطح المنصة
             ctx.fillStyle = '#007A3D';
             ctx.fillRect(p.x, p.y, p.width, 15);
-            // عمق المنصة
             ctx.fillStyle = '#654321';
             ctx.fillRect(p.x, p.y + 15, p.width, p.height - 15);
         });
 
-        // 3. رسم صناديق الأسئلة (؟)
         blocks.forEach(b => {
             if (!b.hit) {
                 ctx.fillStyle = '#FFD700';
@@ -608,7 +579,6 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(b.x, b.y, b.width, b.height);
 
-                // رسم علامة ؟
                 ctx.fillStyle = '#D62612';
                 ctx.font = 'bold 24px Segoe UI';
                 ctx.textAlign = 'center';
@@ -627,20 +597,15 @@
             }
         });
 
-        // 4. رسم القلعة العُمانية في نهاية المستوى
-        // بناء القلعة
         ctx.fillStyle = '#C2B280';
         ctx.fillRect(finishLine.fortX, finishLine.fortY, finishLine.fortWidth, finishLine.fortHeight);
-        // أبراج القلعة
         ctx.fillRect(finishLine.fortX - 30, finishLine.fortY - 40, 70, finishLine.fortHeight + 40);
         ctx.fillRect(finishLine.fortX + finishLine.fortWidth - 40, finishLine.fortY - 40, 70, finishLine.fortHeight + 40);
-        // بوابة القلعة
         ctx.fillStyle = '#4A2E12';
         ctx.beginPath();
         ctx.arc(finishLine.fortX + finishLine.fortWidth / 2, finishLine.fortY + finishLine.fortHeight, 40, Math.PI, 0, false);
         ctx.fill();
 
-        // 5. رسم سارية العلم (نهاية ماريو)
         ctx.fillStyle = '#DDD';
         ctx.fillRect(finishLine.flagX, finishLine.flagY, 8, finishLine.poleHeight);
         ctx.fillStyle = '#FFD700';
@@ -648,7 +613,6 @@
         ctx.arc(finishLine.flagX + 4, finishLine.flagY, 10, 0, Math.PI * 2);
         ctx.fill();
 
-        // رسم علم عُمان المنزلق
         let flagY = finishLine.flagSlideY;
         ctx.fillStyle = '#D62612';
         ctx.fillRect(finishLine.flagX + 8, flagY, 50, 30);
@@ -657,11 +621,9 @@
         ctx.fillStyle = '#007A3D';
         ctx.fillRect(finishLine.flagX + 8, flagY + 20, 50, 10);
 
-        // 6. رسم صورة الشخصية
         ctx.save();
         ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
         
-        // عكس الاتجاه إذا كانت الشخصية تنظر لليسار
         if (player.facing === 'left') {
             ctx.scale(-1, 1);
         }
@@ -675,13 +637,11 @@
                 player.height
             );
         } else {
-            // رسم افتراضي للشخصية إذا لم يتم تحميل الصورة
             ctx.fillStyle = '#D62612';
             ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
         }
         ctx.restore();
 
-        // 7. رسم الألعاب النارية
         fireworks.forEach(f => {
             ctx.fillStyle = f.color;
             ctx.beginPath();
@@ -692,14 +652,12 @@
         ctx.restore();
     }
 
-    // الحلقة الرئيسية للعبة
     function gameLoop() {
         update();
         draw();
         requestAnimationFrame(gameLoop);
     }
 
-    // بدء تشغيل اللعبة
     gameLoop();
 </script>
 
