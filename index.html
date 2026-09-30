@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
-    <!-- استيراد خط عربي مخصص وجريء يناسب طابع ألعاب الفيديو الكلاسيكية -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
@@ -12,7 +11,6 @@
         #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #000; }
         canvas { background-color: #87CEEB; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); max-width: 100%; max-height: 100%; }
         
-        /* تحسين الخطوط والتصميم في شريط المعلومات العلوي HUD */
         #hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 10; }
         .hud-card { background: rgba(20, 20, 20, 0.85); color: #fff; padding: 6px 20px; border-radius: 12px; font-size: 22px; font-weight: 900; border: 3px solid #f1c40f; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-shadow: 2px 2px 0px #000; letter-spacing: 1px; }
         .hud-card span:last-child { color: #f1c40f; }
@@ -24,7 +22,6 @@
         .btn-jump { border-color: #d62828; color: #d62828; width: 95px; height: 95px; border-radius: 50%; }
         .btn-jump:active, .btn-jump.pressed { background: #d62828; color: #fff; }
 
-        /* نوافذ الأسئلة بأسلوب ألعاب الفيديو الحقيقية */
         .modal { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #1a1a1a; border: 4px solid #f1c40f; border-radius: 20px; padding: 25px; text-align: center; color: #fff; z-index: 20; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .modal h2 { color: #f1c40f; margin-bottom: 15px; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
         .question-text { font-size: 20px; margin-bottom: 20px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
@@ -32,7 +29,6 @@
         .btn-option:hover { background: #007a3d; transform: translateY(-2px); }
         .btn-option:active { transform: translateY(2px); box-shadow: none; }
 
-        /* شاشة الفوز النهائية */
         #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #1a1a1a; border: 5px solid #f1c40f; border-radius: 25px; padding: 25px; text-align: center; color: #fff; z-index: 30; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
         .win-details { background: #262626; border: 2px dashed #f1c40f; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: 18px; color: #fff; text-align: right; display: flex; flex-direction: column; gap: 10px; font-weight: 900; }
         .btn-restart { margin-top: 10px; background: #d62828; color: white; border: 3px solid #fff; padding: 12px 35px; font-size: 20px; font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
@@ -413,22 +409,46 @@
         ctx.save();
         ctx.translate(-cameraX, 0);
 
+        // --- تصميم المنصات والأرضيات الاحترافي بأسلوب ماريو الكلاسيكي المتطور ---
         platforms.forEach(p => {
-            ctx.fillStyle = '#007a3d'; ctx.fillRect(p.x, p.y, p.w, p.h);
-            ctx.fillStyle = '#d62828'; ctx.fillRect(p.x, p.y, p.w, 5);
+            // جسم المنصة السفلي (نسيج حجري تراثي)
+            ctx.fillStyle = '#6e4726';
+            ctx.fillRect(p.x, p.y + 6, p.w, p.h - 6);
+
+            // طبقة العشب والنمو العلوي الاحترافية
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillRect(p.x, p.y, p.w, 8);
+            
+            // حافة زخرفية علوية لإعطاء مظهر ثلاثي الأبعاد بارز
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(p.x, p.y, p.w, 3);
+
+            // تفاصيل هندسية صخرية جانبية
+            ctx.fillStyle = '#53351b';
+            for (let i = 15; i < p.w; i += 40) {
+                ctx.fillRect(p.x + i, p.y + 10, 12, p.h - 12);
+            }
         });
 
+        // --- تصميم كتل الحجارة العائمة الاحترافية ---
         stones.forEach(stone => {
             ctx.save();
+            // قاعدة الكتلة الصخرية
             ctx.fillStyle = '#7f8c8d';
             ctx.strokeStyle = '#2c3e50';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.roundRect(stone.x, stone.y, stone.w, stone.h, [8, 8, 2, 2]);
+            ctx.roundRect(stone.x, stone.y, stone.w, stone.h, [6, 6, 6, 6]);
             ctx.fill();
             ctx.stroke();
+
+            // تفاصيل الإطار الداخلي والنقش الحجري
             ctx.fillStyle = '#95a5a6';
-            ctx.fillRect(stone.x + 8, stone.y + 8, 10, 8);
+            ctx.fillRect(stone.x + 6, stone.y + 6, stone.w - 12, stone.h - 12);
+
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(stone.x + 10, stone.y + 10, stone.w - 20, 4);
+            ctx.fillRect(stone.x + 10, stone.y + stone.h - 14, stone.w - 20, 4);
             ctx.restore();
         });
 
