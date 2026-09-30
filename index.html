@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مغامرات في بلادي 🇴🇲</title>
+    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
         body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
@@ -84,13 +84,13 @@
         try {
             initAudio();
             if (!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
             let now = audioCtx.currentTime;
 
             if (type === 'jump') {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(150, now);
                 osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
@@ -99,6 +99,10 @@
                 osc.start(now);
                 osc.stop(now + 0.15);
             } else if (type === 'flag') {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(440, now);
                 osc.frequency.setValueAtTime(880, now + 0.08);
@@ -106,6 +110,32 @@
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
                 osc.start(now);
                 osc.stop(now + 0.2);
+            } else if (type === 'firework') {
+                // صوت انفجار ألعاب نارية واقعي (مزيج ترددات منخفضة مع ضوضاء بيضاء)
+                let bufferSize = audioCtx.sampleRate * 0.5;
+                let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                let data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                let noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                
+                let filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, now);
+                filter.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+
+                let gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                noise.start(now);
+                noise.stop(now + 0.5);
             } else if (type === 'win') {
                 let notes = [300, 400, 500, 650, 800];
                 notes.forEach((freq, i) => {
@@ -181,16 +211,16 @@
         { x: 1900, y: 220, collected: false }, { x: 2250, y: 270, collected: false }
     ];
 
-    // الأسئلة موزعة: بعضها تحت (على الطريق مباشرة) والبعض الآخر فوق (فوق المنصات ليحتاج للقفز)
     let questionTriggers = [
-        { x: 500, y: 370, qIndex: 0, active: true }, // تحت
-        { x: 1050, y: 250, qIndex: 1, active: true }, // فوق (فوق المنصة)
-        { x: 1450, y: 370, qIndex: 2, active: true }, // تحت
-        { x: 1900, y: 200, qIndex: 3, active: true }, // فوق (فوق المنصة)
-        { x: 2500, y: 370, qIndex: 4, active: true }  // تحت
+        { x: 500, y: 370, qIndex: 0, active: true },
+        { x: 1050, y: 250, qIndex: 1, active: true },
+        { x: 1450, y: 370, qIndex: 2, active: true },
+        { x: 1900, y: 200, qIndex: 3, active: true },
+        { x: 2500, y: 370, qIndex: 4, active: true }
     ];
 
-    const castle = { x: 2800, y: 150, w: 280, h: 270, doorX: 2910 };
+    // حصن/قلعة عُمانية مطورة ومحسنة
+    const castle = { x: 2750, y: 120, w: 320, h: 300, doorX: 2890 };
     let fireworks = [];
 
     const keys = { left: false, right: false };
@@ -314,7 +344,6 @@
                 }
             });
 
-            // التحقق من تفعيل الأسئلة (سواء فوق أو تحت)
             questionTriggers.forEach(q => {
                 if (q.active && player.x < q.x + 35 && player.x + player.width > q.x &&
                     player.y < q.y + 40 && player.y + player.height > q.y) {
@@ -330,19 +359,20 @@
         if (!gameFinished && player.x >= castle.doorX) {
             gameFinished = true; player.hidden = true;
             playSound('win');
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 setTimeout(() => {
-                    for (let f = 0; f < 35; f++) {
-                        fireworks.push({ x: castle.x + 140, y: castle.y + 50, vx: (Math.random()-0.5)*9, vy: (Math.random()-0.5)*9, color: ['#d62828','#007a3d','#fff','#ffd166'][Math.floor(Math.random()*4)], alpha: 1 });
+                    playSound('firework'); // تشغيل صوت الألعاب النارية مع كل انفجار
+                    for (let f = 0; f < 40; f++) {
+                        fireworks.push({ x: castle.x + 160 + (Math.random()*100 - 50), y: castle.y + 80 + (Math.random()*80 - 40), vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, color: ['#d62828','#007a3d','#f1c40f','#fff','#e67e22'][Math.floor(Math.random()*5)], alpha: 1 });
                     }
-                }, i * 400);
+                }, i * 450);
             }
             setTimeout(() => {
                 document.getElementById('final-questions').innerText = answeredCount;
                 document.getElementById('final-flags').innerText = collectedFlagsCount;
                 document.getElementById('final-score').innerText = score;
                 document.getElementById('win-screen').style.display = 'block';
-            }, 2500);
+            }, 3000);
         }
 
         if (gameFinished) {
@@ -393,7 +423,6 @@
             }
         });
 
-        // شكل جديد لصناديق الأسئلة (نجمة ذهبية متألقة ⭐ للإشارة للسؤال)
         questionTriggers.forEach(q => {
             if (q.active) {
                 ctx.save();
@@ -413,27 +442,55 @@
             }
         });
 
-        ctx.fillStyle = '#c5a059'; ctx.fillRect(castle.x, castle.y, castle.w, castle.h);
-        ctx.fillStyle = '#a37033'; 
-        ctx.fillRect(castle.x - 20, castle.y - 40, 50, castle.h + 40);
-        ctx.fillRect(castle.x + castle.w - 30, castle.y - 40, 50, castle.h + 40);
+        // --- رسم الحصن/القلعة العُمانية الإبداعية المحسنة ---
+        ctx.save();
+        // الجدار الرئيسي الحصين بلون طيني تراثي جميل
+        ctx.fillStyle = '#b58863';
+        ctx.fillRect(castle.x, castle.y, castle.w, castle.h);
         
-        ctx.fillStyle = '#8b5a2b';
-        for (let i = -20; i < 30; i += 15) ctx.fillRect(castle.x + i, castle.y - 55, 10, 15);
-        for (let i = castle.w - 30; i < castle.w + 20; i += 15) ctx.fillRect(castle.x + i, castle.y - 55, 10, 15);
-
-        for (let i = 40; i < castle.w - 40; i += 30) ctx.fillRect(castle.x + i, castle.y - 18, 20, 18);
-
-        ctx.fillStyle = '#3a2e2b'; 
+        // الأبراج الجانبية الأسطوانية الدائرية (طابع القلاع العُمانية التاريخية)
+        ctx.fillStyle = '#8c6239';
         ctx.beginPath();
-        ctx.arc(castle.x + 140, castle.y + 160, 35, Math.PI, 0, false);
+        ctx.arc(castle.x + 30, castle.y + 40, 45, Math.PI, 0, false);
         ctx.fill();
-        ctx.fillRect(castle.x + 105, castle.y + 160, 70, 110);
+        ctx.fillRect(castle.x - 15, castle.y + 40, 90, castle.h - 40);
 
-        ctx.strokeStyle = '#222'; ctx.lineWidth = 4;
-        ctx.strokeRect(castle.x + 105, castle.y + 160, 70, 110);
-        ctx.font = '24px sans-serif';
-        ctx.fillText('🇴🇲', castle.x + 125, castle.y + 70);
+        ctx.beginPath();
+        ctx.arc(castle.x + castle.w - 30, castle.y + 40, 45, Math.PI, 0, false);
+        ctx.fill();
+        ctx.fillRect(castle.x + castle.w - 75, castle.y + 40, 90, castle.h - 40);
+
+        // تفاصيل الشرفات العلوية المسننة (للحصون العُمانية)
+        ctx.fillStyle = '#654321';
+        for (let i = -15; i < castle.w + 15; i += 25) {
+            ctx.fillRect(castle.x + i, castle.y - 15, 15, 15);
+        }
+
+        // نوافذ دفاعية صغيرة (مزاغل)
+        ctx.fillStyle = '#3a2e2b';
+        ctx.fillRect(castle.x + 40, castle.y + 90, 12, 25);
+        ctx.fillRect(castle.x + 90, castle.y + 90, 12, 25);
+        ctx.fillRect(castle.x + castle.w - 100, castle.y + 90, 12, 25);
+        ctx.fillRect(castle.x + castle.w - 50, castle.y + 90, 12, 25);
+
+        // البوابة الرئيسية الخشبية القوسية المزخرفة
+        ctx.fillStyle = '#2c1d11';
+        ctx.beginPath();
+        ctx.arc(castle.x + castle.w / 2, castle.y + 190, 40, Math.PI, 0, false);
+        ctx.fill();
+        ctx.fillRect(castle.x + (castle.w / 2) - 40, castle.y + 190, 80, 110);
+
+        // إطار البوابة والأشرطة المعدنية الزخرفية
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(castle.x + (castle.w / 2) - 40, castle.y + 190, 80, 110);
+
+        // علم السلطنة فوق القلعة
+        ctx.font = '32px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 25);
+        ctx.restore();
+        // ----------------------------------------------------
 
         if (!player.hidden) {
             ctx.save();
@@ -457,7 +514,7 @@
 
         fireworks.forEach(p => {
             ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill(); ctx.restore();
+            ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill(); ctx.restore();
         });
 
         ctx.restore();
