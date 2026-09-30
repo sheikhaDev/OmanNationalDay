@@ -2,14 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مغامرة العيد الوطني العُماني المجيد</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مغامرة العيد الوطني العُماني للأطفال</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap');
+
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Tajawal', sans-serif;
         }
 
         body, html {
@@ -18,7 +20,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #111;
+            background: #0d0f18;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,11 +30,12 @@
             position: relative;
             width: 1000px;
             height: 550px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 122, 61, 0.4);
+            border-radius: 20px;
             overflow: hidden;
             background: #000;
             outline: none;
+            border: 4px solid #FFD700;
         }
 
         canvas {
@@ -47,7 +50,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -56,6 +60,12 @@
             text-align: center;
             z-index: 10;
             padding: 20px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .hidden {
@@ -63,86 +73,104 @@
         }
 
         h1 {
-            color: #D62612;
-            font-size: 42px;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px #000, 0 0 10px #007A3D;
+            color: #FFD700;
+            font-size: 46px;
+            margin: 0 0 15px 0;
+            text-shadow: 3px 3px 0px #D62612, 0 0 20px rgba(255, 215, 0, 0.6);
+            letter-spacing: 1px;
         }
 
         p {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: #f1f1f1;
-            max-width: 600px;
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            max-width: 650px;
             line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
         .btn {
-            background: linear-gradient(135deg, #007A3D, #004d26);
-            color: white;
-            border: 2px solid #FFD700;
-            padding: 15px 40px;
-            font-size: 24px;
-            font-weight: bold;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #111;
+            border: 4px solid #FFF;
+            padding: 16px 45px;
+            font-size: 26px;
+            font-weight: 900;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-            transition: all 0.2s ease;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.8);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #D62612, #990000);
+            transform: scale(1.1) rotate(-1deg);
+            background: linear-gradient(135deg, #00E676, #007A3D);
+            color: #FFF;
+            box-shadow: 0 12px 30px rgba(0, 230, 118, 0.6);
         }
 
         .quiz-card {
-            background: rgba(20, 20, 20, 0.95);
-            border: 3px solid #FFD700;
-            border-radius: 15px;
+            background: linear-gradient(145deg, #1e2638, #111622);
+            border: 4px solid #FFD700;
+            border-radius: 25px;
             padding: 30px;
-            max-width: 550px;
+            max-width: 600px;
             width: 90%;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.4);
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .quiz-card h2 {
-            color: #FFD700;
+            color: #00FF88;
             margin-top: 0;
-            font-size: 26px;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(0,255,136,0.3);
         }
 
         .options-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 25px;
         }
 
         .option-btn {
-            background: #2a2a2a;
+            background: #2a344a;
             color: #fff;
-            border: 1px solid #555;
-            padding: 12px 20px;
-            font-size: 18px;
-            border-radius: 8px;
+            border: 2px solid #4a5978;
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: 700;
+            border-radius: 15px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
             text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .option-btn:hover {
             background: #007A3D;
             border-color: #FFD700;
+            transform: translateX(-8px);
         }
 
+        /* أزرار التحكم باللمس للأطفال */
         #touchControls {
             position: absolute;
-            bottom: 15px;
+            bottom: 20px;
             left: 0;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 25px;
             z-index: 5;
             pointer-events: none;
         }
@@ -154,23 +182,27 @@
         }
 
         .touch-btn {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.3);
-            border: 2px solid #fff;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+            border: 3px solid #FFF;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 32px;
             color: white;
             user-select: none;
             touch-action: manipulation;
             cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s, background 0.1s;
         }
 
         .touch-btn:active {
-            background: rgba(0, 122, 61, 0.7);
+            transform: scale(0.88);
+            background: rgba(0, 230, 118, 0.8);
         }
     </style>
 </head>
@@ -179,12 +211,14 @@
 <div id="gameContainer" tabindex="0">
     <canvas id="gameCanvas" width="1000" height="550"></canvas>
 
+    <!-- واجهة البداية -->
     <div id="startScreen" class="overlay">
-        <h1>مغامرة العيد الوطني العُماني</h1>
-        <p>اجمع الإجابات الصحيحة من صناديق المعرفة (؟) واصل إلى القلعة العُمانية للاحتفال بالعيد الوطني المجيد!</p>
+        <h1>مغامرة العيد الوطني العُماني 🇴🇲</h1>
+        <p>اقفز واضرب صناديق المعرفة الذهبية (؟) للإجابة على الأسئلة والوصول إلى القلعة العُمانية الاحتفالية!</p>
         <button class="btn" id="startBtn">ابدأ اللعب فوراً 🚀</button>
     </div>
 
+    <!-- واجهة السؤال -->
     <div id="quizScreen" class="overlay hidden">
         <div class="quiz-card">
             <h2 id="quizQuestion">السؤال هنا؟</h2>
@@ -192,12 +226,14 @@
         </div>
     </div>
 
+    <!-- واجهة الفوز -->
     <div id="winScreen" class="overlay hidden">
-        <h1 style="color: #FFD700;">كل عام وعُمان بخير! 🇴🇲</h1>
-        <p>لقد أتممت المغامرة بنجاح ووصلت إلى القلعة العُمانية المجيدة!</p>
+        <h1>عاشت عُمان حرة أبية! 🎉</h1>
+        <p>ممتاز جداً يا بطل! لقد أتممت المهمة ووصلت لقلعة النصر بنجاح 🇴🇲✨</p>
         <button class="btn" id="restartBtn">إعادة اللعب 🔄</button>
     </div>
 
+    <!-- التحكم باللمس -->
     <div id="touchControls">
         <div class="touch-group">
             <div class="touch-btn" id="btnLeft">◀</div>
@@ -214,12 +250,14 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    // تحميل الصور
     const bgImage = new Image();
     bgImage.src = '814.webp';
 
     const playerImage = new Image();
     playerImage.src = '813.png';
 
+    // محرك الصوتيات
     let audioCtx = null;
 
     function initAudio() {
@@ -240,126 +278,162 @@
             gain.connect(audioCtx.destination);
 
             if (type === 'jump') {
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.18);
                 gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
+                osc.stop(audioCtx.currentTime + 0.18);
             } else if (type === 'hitBlock') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-            } else if (type === 'correct') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(700, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'correct') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.type = 'sine';
+                    noteOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+                    noteGain.gain.setValueAtTime(0.25, audioCtx.currentTime + idx * 0.08);
+                    noteGain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.2);
+                    noteOsc.start(audioCtx.currentTime + idx * 0.08);
+                    noteOsc.stop(audioCtx.currentTime + idx * 0.08 + 0.2);
+                });
             } else if (type === 'firework') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100 + Math.random() * 200, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(150 + Math.random() * 250, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.stop(audioCtx.currentTime + 0.35);
             }
         } catch(e) {}
     }
 
+    // أسئلة المسابقة
     const questions = [
         {
-            q: "ما هو تاريخ العيد الوطني العُماني؟",
+            q: "ما هو تاريخ العيد الوطني العُماني المجيد؟ 🇴🇲",
             options: ["18 نوفمبر", "23 يوليو", "1 يناير", "18 ديسمبر"],
             answer: 0
         },
         {
-            q: "ما هي عاصمة سلطنة عُمان؟",
+            q: "ما هي عاصمة سلطنة عُمان الجميلة؟ 🏰",
             options: ["صلالة", "مسقط", "صحار", "نزوى"],
             answer: 1
         },
         {
-            q: "ما هو رمز الخنجر العُماني على العلم؟",
-            options: ["الأصالة والتراث", "القوة العسكرية", "الزراعة", "التجارة البحرية"],
+            q: "إلى ماذا يرمز الخنجر العُماني في علم السلطنة؟ 🗡️",
+            options: ["الأصالة والتراث العُماني", "القوة العسكرية", "الزراعة", "التجارة البحرية"],
             answer: 0
         }
     ];
 
     let gameState = 'START';
     let activeBlock = null;
+    let globalFrame = 0;
 
     const keys = { right: false, left: false, up: false };
 
     let cameraX = 0;
     const worldWidth = 3200;
 
+    // خصائص اللاعب المعدلة لحركة كرتونية ممتعة
     const player = {
         x: 100,
         y: 300,
-        width: 50,
-        height: 70,
+        width: 55,
+        height: 75,
         vx: 0,
         vy: 0,
-        speed: 5,
-        gravity: 0.6,
-        jumpPower: -12,
+        accel: 0.8,
+        friction: 0.82,
+        maxSpeed: 6.5,
+        gravity: 0.55,
+        jumpPower: -13,
         grounded: false,
-        facing: 'right'
+        facing: 'right',
+        rotation: 0,
+        scaleY: 1
     };
 
+    // المنصات
     const platforms = [
-        { x: 0, y: 480, width: 1200, height: 70 },
-        { x: 1350, y: 480, width: 1800, height: 70 },
-        { x: 300, y: 350, width: 150, height: 20 },
-        { x: 700, y: 320, width: 200, height: 20 },
-        { x: 1400, y: 360, width: 180, height: 20 },
-        { x: 1800, y: 300, width: 200, height: 20 }
+        { x: 0, y: 470, width: 1200, height: 80 },
+        { x: 1350, y: 470, width: 1800, height: 80 },
+        { x: 320, y: 340, width: 160, height: 25 },
+        { x: 720, y: 310, width: 220, height: 25 },
+        { x: 1420, y: 350, width: 180, height: 25 },
+        { x: 1820, y: 290, width: 220, height: 25 }
     ];
 
+    // صناديق الأسئلة
     const blocks = [
-        { x: 350, y: 220, width: 40, height: 40, hit: false, questionIndex: 0 },
-        { x: 780, y: 190, width: 40, height: 40, hit: false, questionIndex: 1 },
-        { x: 1880, y: 170, width: 40, height: 40, hit: false, questionIndex: 2 }
+        { x: 380, y: 200, width: 45, height: 45, hit: false, questionIndex: 0, bounceY: 0 },
+        { x: 800, y: 170, width: 45, height: 45, hit: false, questionIndex: 1, bounceY: 0 },
+        { x: 1900, y: 150, width: 45, height: 45, hit: false, questionIndex: 2, bounceY: 0 }
     ];
 
+    // القلعة وسارية العلم
     const finishLine = {
         flagX: 2600,
-        flagY: 180,
+        flagY: 170,
         poleHeight: 300,
-        flagSlideY: 180,
+        flagSlideY: 170,
         fortX: 2750,
-        fortY: 230,
-        fortWidth: 350,
-        fortHeight: 250
+        fortY: 210,
+        fortWidth: 360,
+        fortHeight: 260
     };
 
+    // تأثيرات الجسيمات
+    let particles = [];
+
+    function addParticles(x, y, color, count = 15) {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                color: color,
+                size: Math.random() * 6 + 3,
+                life: 30 + Math.random() * 20
+            });
+        }
+    }
+
+    // الألعاب النارية
     let fireworks = [];
 
     function createFirework() {
         const x = finishLine.fortX + Math.random() * finishLine.fortWidth;
-        const y = finishLine.fortY - Math.random() * 150;
-        const colors = ['#D62612', '#007A3D', '#FFD700', '#FFFFFF'];
-        for (let i = 0; i < 25; i++) {
+        const y = finishLine.fortY - Math.random() * 180;
+        const colors = ['#D62612', '#007A3D', '#FFD700', '#00E676', '#FFFFFF'];
+        for (let i = 0; i < 35; i++) {
             fireworks.push({
                 x: x,
                 y: y,
-                vx: (Math.random() - 0.5) * 6,
-                vy: (Math.random() - 0.5) * 6,
+                vx: (Math.random() - 0.5) * 9,
+                vy: (Math.random() - 0.5) * 9,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                life: 30 + Math.random() * 20
+                size: Math.random() * 5 + 2,
+                life: 40 + Math.random() * 20
             });
         }
         playSound('firework');
     }
 
+    // أحداث المفاتيح
     window.addEventListener('keydown', e => {
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
             e.preventDefault();
@@ -370,6 +444,7 @@
             if (!keys.up && player.grounded && gameState === 'PLAYING') {
                 player.vy = player.jumpPower;
                 player.grounded = false;
+                player.scaleY = 1.3;
                 playSound('jump');
             }
             keys.up = true;
@@ -382,6 +457,7 @@
         if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = false;
     });
 
+    // أحداث أزرار اللمس
     const setupTouchBtn = (id, keyName) => {
         const btn = document.getElementById(id);
         const startAction = (e) => {
@@ -390,6 +466,7 @@
             if (keyName === 'up' && player.grounded && gameState === 'PLAYING') {
                 player.vy = player.jumpPower;
                 player.grounded = false;
+                player.scaleY = 1.3;
                 playSound('jump');
             }
             keys[keyName] = true;
@@ -422,9 +499,10 @@
         player.vx = 0;
         player.vy = 0;
         cameraX = 0;
-        finishLine.flagSlideY = 180;
+        finishLine.flagSlideY = 170;
         blocks.forEach(b => b.hit = false);
         fireworks = [];
+        particles = [];
         document.getElementById('winScreen').classList.add('hidden');
         container.focus();
         gameState = 'PLAYING';
@@ -442,7 +520,7 @@
         qData.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.innerText = opt;
+            btn.innerHTML = `<span>${opt}</span> <span>⭐</span>`;
             btn.onclick = () => answerQuiz(idx);
             optionsContainer.appendChild(btn);
         });
@@ -455,52 +533,71 @@
         if (selectedIndex === qData.answer) {
             playSound('correct');
             activeBlock.hit = true;
+            addParticles(activeBlock.x + activeBlock.width / 2, activeBlock.y + activeBlock.height / 2, '#FFD700', 30);
             document.getElementById('quizScreen').classList.add('hidden');
             container.focus();
             gameState = 'PLAYING';
         } else {
-            alert('إجابة خاطئة! حاول مرة أخرى.');
+            alert('إجابة خاطئة! حاول مرة أخرى يا بطل 👍');
         }
     }
 
+    // تحديث الحركة والفيزياء
     function update() {
+        globalFrame++;
+
         if (gameState === 'PLAYING') {
+            // التسارع السلس
             if (keys.right) {
-                player.vx = player.speed;
+                if (player.vx < player.maxSpeed) player.vx += player.accel;
                 player.facing = 'right';
             } else if (keys.left) {
-                player.vx = -player.speed;
+                if (player.vx > -player.maxSpeed) player.vx -= player.accel;
                 player.facing = 'left';
             } else {
-                player.vx = 0;
+                player.vx *= player.friction;
             }
 
+            // الجاذبية والسرعة
             player.vy += player.gravity;
             player.x += player.vx;
             player.y += player.vy;
 
+            // استعادة شكل القفز
+            player.scaleY += (1 - player.scaleY) * 0.15;
+
+            // ميلان الشخصية أثناء الحركة الكرتونية
+            player.rotation = (player.vx * 0.04);
+
             if (player.x < 0) player.x = 0;
             player.grounded = false;
 
+            // التصادم مع المنصات
             platforms.forEach(p => {
-                if (player.x + player.width > p.x &&
-                    player.x < p.x + p.width &&
+                if (player.x + player.width * 0.7 > p.x &&
+                    player.x + player.width * 0.3 < p.x + p.width &&
                     player.y + player.height >= p.y &&
-                    player.y + player.height <= p.y + player.vy + 10) {
+                    player.y + player.height <= p.y + player.vy + 12) {
                     player.y = p.y - player.height;
                     player.vy = 0;
                     player.grounded = true;
                 }
             });
 
+            // التصادم مع الصناديق الذهبية (ضرب من الأسفل)
             blocks.forEach(b => {
-                if (player.x + player.width > b.x &&
-                    player.x < b.x + b.width &&
+                // ارتجاج الصندوق
+                if (b.bounceY < 0) b.bounceY += 1.5;
+
+                if (player.x + player.width * 0.8 > b.x &&
+                    player.x + player.width * 0.2 < b.x + b.width &&
                     player.y <= b.y + b.height &&
-                    player.y >= b.y + b.height + player.vy - 5) {
+                    player.y >= b.y + b.height + player.vy - 8) {
                     
                     player.y = b.y + b.height;
                     player.vy = 1;
+                    b.bounceY = -12;
+
                     if (!b.hit) {
                         playSound('hitBlock');
                         triggerQuiz(b);
@@ -508,6 +605,7 @@
                 }
             });
 
+            // السقوط في الحفرة
             if (player.y > canvas.height + 100) {
                 player.x = 100;
                 player.y = 300;
@@ -515,115 +613,176 @@
                 player.vy = 0;
             }
 
+            // الوصول لخط النهاية (سارية العلم)
             if (player.x + player.width >= finishLine.flagX) {
                 gameState = 'VICTORY_SEQUENCE';
                 player.x = finishLine.flagX - player.width / 2;
+                player.rotation = 0;
             }
 
-            cameraX = player.x - canvas.width / 3;
+            // كاميرا سلسة متابعة للاعب
+            let targetCameraX = player.x - canvas.width / 3;
+            cameraX += (targetCameraX - cameraX) * 0.1;
             if (cameraX < 0) cameraX = 0;
             if (cameraX > worldWidth - canvas.width) cameraX = worldWidth - canvas.width;
         } 
         else if (gameState === 'VICTORY_SEQUENCE') {
-            if (finishLine.flagSlideY < finishLine.flagY + finishLine.poleHeight - 50) {
-                finishLine.flagSlideY += 3;
+            // انزلاق سارية العلم ماريو
+            if (finishLine.flagSlideY < finishLine.flagY + finishLine.poleHeight - 60) {
+                finishLine.flagSlideY += 3.5;
                 player.y = finishLine.flagSlideY;
             } else {
-                player.x += 3;
+                player.x += 3.5;
                 player.facing = 'right';
-                if (player.x >= finishLine.fortX + 100) {
+                if (player.x >= finishLine.fortX + 110) {
                     gameState = 'WIN';
                     document.getElementById('winScreen').classList.remove('hidden');
                 }
             }
         }
 
+        // تحديث الجسيمات والألعاب النارية
+        particles.forEach((p, idx) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            if (p.life <= 0) particles.splice(idx, 1);
+        });
+
         if (gameState === 'WIN' || gameState === 'VICTORY_SEQUENCE') {
-            if (Math.random() < 0.1) createFirework();
-            fireworks.forEach((f, index) => {
+            if (Math.random() < 0.12) createFirework();
+            fireworks.forEach((f, idx) => {
                 f.x += f.vx;
                 f.y += f.vy;
                 f.life--;
-                if (f.life <= 0) fireworks.splice(index, 1);
+                if (f.life <= 0) fireworks.splice(idx, 1);
             });
         }
     }
 
+    // دالة الرسم الرئيسية
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // 1. رسم صورة الخلفية مع التمرير السلس
         if (bgImage.complete && bgImage.naturalWidth !== 0) {
-            let bgX = -(cameraX * 0.3) % canvas.width;
+            let bgX = -(cameraX * 0.35) % canvas.width;
             ctx.drawImage(bgImage, bgX, 0, canvas.width, canvas.height);
             ctx.drawImage(bgImage, bgX + canvas.width, 0, canvas.width, canvas.height);
         } else {
-            ctx.fillStyle = '#87CEEB';
+            ctx.fillStyle = '#1e293b';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
         ctx.save();
-        ctx.translate(-cameraX, 0);
+        ctx.translate(-Math.floor(cameraX), 0);
 
+        // 2. رسم المنصات بتصميم ملون جذاب للأطفال
         platforms.forEach(p => {
-            ctx.fillStyle = '#007A3D';
-            ctx.fillRect(p.x, p.y, p.width, 15);
-            ctx.fillStyle = '#654321';
+            // عشب أخضر ناصع في الأعلى
+            ctx.fillStyle = '#00E676';
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, p.width, 15, [8, 8, 0, 0]);
+            ctx.fill();
+
+            // جسم المنصة الخشبي/الحجري
+            ctx.fillStyle = '#5D4037';
             ctx.fillRect(p.x, p.y + 15, p.width, p.height - 15);
-        });
 
-        blocks.forEach(b => {
-            if (!b.hit) {
-                ctx.fillStyle = '#FFD700';
-                ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = '#B8860B';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(b.x, b.y, b.width, b.height);
-
-                ctx.fillStyle = '#D62612';
-                ctx.font = 'bold 24px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText('؟', b.x + b.width / 2, b.y + 28);
-            } else {
-                ctx.fillStyle = '#8B8B8B';
-                ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = '#555';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(b.x, b.y, b.width, b.height);
-
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 20px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText('✓', b.x + b.width / 2, b.y + 26);
+            // خطوط تزيين للمنصة
+            ctx.fillStyle = '#3E2723';
+            for (let x = p.x + 10; x < p.x + p.width; x += 30) {
+                ctx.fillRect(x, p.y + 20, 15, p.height - 25);
             }
         });
 
-        ctx.fillStyle = '#C2B280';
+        // 3. رسم صناديق المعرفة (؟) الكرتونية المتحركة
+        blocks.forEach(b => {
+            let floatY = Math.sin(globalFrame * 0.08 + b.x) * 4; // طفو ملحوظ للأطفال
+            let drawY = b.y + b.bounceY + (b.hit ? 0 : floatY);
+
+            if (!b.hit) {
+                // صندوق ذهبي مشرق
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.roundRect(b.x, drawY, b.width, b.height, 8);
+                ctx.fill();
+
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#FFA500';
+                ctx.stroke();
+
+                // رسم علامة ؟
+                ctx.fillStyle = '#D62612';
+                ctx.font = '900 28px Tajawal';
+                ctx.textAlign = 'center';
+                ctx.fillText('؟', b.x + b.width / 2, drawY + 33);
+            } else {
+                // صندوق مكتمل
+                ctx.fillStyle = '#78909C';
+                ctx.beginPath();
+                ctx.roundRect(b.x, drawY, b.width, b.height, 8);
+                ctx.fill();
+
+                ctx.fillStyle = '#ECEFF1';
+                ctx.font = '900 24px Tajawal';
+                ctx.textAlign = 'center';
+                ctx.fillText('✓', b.x + b.width / 2, drawY + 31);
+            }
+        });
+
+        // 4. رسم القلعة العُمانية المجيدة
+        ctx.fillStyle = '#D7CCC8';
         ctx.fillRect(finishLine.fortX, finishLine.fortY, finishLine.fortWidth, finishLine.fortHeight);
-        ctx.fillRect(finishLine.fortX - 30, finishLine.fortY - 40, 70, finishLine.fortHeight + 40);
-        ctx.fillRect(finishLine.fortX + finishLine.fortWidth - 40, finishLine.fortY - 40, 70, finishLine.fortHeight + 40);
-        ctx.fillStyle = '#4A2E12';
+        
+        // أطراف وأبراج القلعة
+        ctx.fillRect(finishLine.fortX - 35, finishLine.fortY - 50, 80, finishLine.fortHeight + 50);
+        ctx.fillRect(finishLine.fortX + finishLine.fortWidth - 45, finishLine.fortY - 50, 80, finishLine.fortHeight + 50);
+        
+        // شرفات البرج
+        ctx.fillStyle = '#8D6E63';
+        for(let i = -35; i < 45; i += 20) {
+            ctx.fillRect(finishLine.fortX + i, finishLine.fortY - 60, 10, 10);
+            ctx.fillRect(finishLine.fortX + finishLine.fortWidth + i - 10, finishLine.fortY - 60, 10, 10);
+        }
+
+        // قوس البوابة
+        ctx.fillStyle = '#3E2723';
         ctx.beginPath();
-        ctx.arc(finishLine.fortX + finishLine.fortWidth / 2, finishLine.fortY + finishLine.fortHeight, 40, Math.PI, 0, false);
+        ctx.arc(finishLine.fortX + finishLine.fortWidth / 2, finishLine.fortY + finishLine.fortHeight, 45, Math.PI, 0, false);
         ctx.fill();
 
-        ctx.fillStyle = '#DDD';
-        ctx.fillRect(finishLine.flagX, finishLine.flagY, 8, finishLine.poleHeight);
+        // 5. رسم سارية العلم وعلم عُمان
+        ctx.fillStyle = '#E0E0E0';
+        ctx.fillRect(finishLine.flagX, finishLine.flagY, 10, finishLine.poleHeight);
         ctx.fillStyle = '#FFD700';
         ctx.beginPath();
-        ctx.arc(finishLine.flagX + 4, finishLine.flagY, 10, 0, Math.PI * 2);
+        ctx.arc(finishLine.flagX + 5, finishLine.flagY, 12, 0, Math.PI * 2);
         ctx.fill();
 
+        // علم عُمان المنزلق
         let flagY = finishLine.flagSlideY;
         ctx.fillStyle = '#D62612';
-        ctx.fillRect(finishLine.flagX + 8, flagY, 50, 30);
-        ctx.fillStyle = '#FFF';
-        ctx.fillRect(finishLine.flagX + 8, flagY, 50, 10);
+        ctx.fillRect(finishLine.flagX + 10, flagY, 60, 36);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(finishLine.flagX + 10, flagY, 60, 12);
         ctx.fillStyle = '#007A3D';
-        ctx.fillRect(finishLine.flagX + 8, flagY + 20, 50, 10);
+        ctx.fillRect(finishLine.flagX + 10, flagY + 24, 60, 12);
 
+        // 6. رسم الجسيمات
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 7. رسم صورة الشخصية مع حركة الأنيميشن والتدوير الكرتوني
         ctx.save();
         ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-        
+        ctx.rotate(player.rotation);
+        ctx.scale(1, player.scaleY);
+
         if (player.facing === 'left') {
             ctx.scale(-1, 1);
         }
@@ -637,21 +796,26 @@
                 player.height
             );
         } else {
+            // شخصية احتياطية كرتونية
             ctx.fillStyle = '#D62612';
-            ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
+            ctx.beginPath();
+            ctx.roundRect(-player.width / 2, -player.height / 2, player.width, player.height, 10);
+            ctx.fill();
         }
         ctx.restore();
 
+        // 8. رسم الألعاب النارية الاحتفالية
         fireworks.forEach(f => {
             ctx.fillStyle = f.color;
             ctx.beginPath();
-            ctx.arc(f.x, f.y, 3, 0, Math.PI * 2);
+            ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
             ctx.fill();
         });
 
         ctx.restore();
     }
 
+    // الحلقة الرئيسية للعبة
     function gameLoop() {
         update();
         draw();
