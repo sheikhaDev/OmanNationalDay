@@ -3,1236 +3,865 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🇴🇲 مغامرة العيد الوطني العُماني 🇴🇲</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Arabic Google Fonts: Cairo & Changanga for playful kid friendly typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Changa:wght@700;800&display=swap" rel="stylesheet">
+    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
     <style>
         * {
-            font-family: 'Cairo', 'Changa', sans-serif;
+            box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-        body {
-            background-color: #0f172a;
-            overflow: hidden;
             margin: 0;
             padding: 0;
-            width: 100vw;
-            height: 100vh;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            color: #fff;
+            overflow: hidden;
+            touch-action: manipulation;
+            direction: rtl;
         }
         #game-container {
             position: relative;
-            width: 100%;
+            width: 100vw;
             height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #38bdf8, #bae6fd);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
         }
         canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
+            background-color: #87CEEB;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            max-width: 100%;
+            max-height: 100%;
         }
-        /* Touch buttons styling for kids - Professional 3D Tactile Design */
-        .kid-btn {
-            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
-            border: 4px solid #f59e0b;
-            box-shadow: 0 8px 0 #d97706, 0 12px 25px rgba(0,0,0,0.3);
-            border-radius: 2rem;
-            backdrop-filter: blur(8px);
-            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Top HUD */
+        #hud {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
         }
-        .kid-btn:active {
-            transform: translateY(6px) scale(0.96);
-            box-shadow: 0 2px 0 #d97706, 0 4px 12px rgba(0,0,0,0.25);
-            background: #fef08a;
+        .hud-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #d62828;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #007a3d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .jump-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: 4px solid #34d399;
-            box-shadow: 0 8px 0 #047857, 0 12px 25px rgba(0,0,0,0.35);
-            border-radius: 2.2rem;
-            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Touch Controls */
+        #touch-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+            pointer-events: none;
         }
-        .jump-btn:active {
-            transform: translateY(6px) scale(0.96);
-            box-shadow: 0 2px 0 #047857, 0 4px 12px rgba(0,0,0,0.2);
-            background: #047857;
+        .control-group {
+            display: flex;
+            gap: 15px;
+            pointer-events: auto;
         }
-        /* Floating animations */
-        @keyframes float-kid {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+        .btn-touch {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(220,220,220,0.9));
+            border: 3px solid #007a3d;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            color: #007a3d;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            cursor: pointer;
+            active-scale: 0.95;
         }
-        .animate-float {
-            animation: float-kid 2.5s ease-in-out infinite;
+        .btn-touch:active {
+            transform: scale(0.92);
+            background: #007a3d;
+            color: #fff;
         }
-        @keyframes pop-bounce {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
+        .btn-jump {
+            border-color: #d62828;
+            color: #d62828;
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
         }
-        .pop-in {
-            animation: pop-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .btn-jump:active {
+            background: #d62828;
+            color: #fff;
+        }
+        /* Modal Window for Questions */
+        .modal {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 4px solid #007a3d;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 20;
+            display: none;
+        }
+        .modal h2 {
+            color: #d62828;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .modal .question-text {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .btn-option {
+            background: #f8f9fa;
+            border: 2px solid #007a3d;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-option:hover {
+            background: #007a3d;
+            color: #fff;
+        }
+        #feedback-msg {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 25px;
+        }
+        /* Win Screen */
+        #win-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 480px;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border: 5px solid #d62828;
+            border-radius: 25px;
+            padding: 25px;
+            text-align: center;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 30;
+            display: none;
+        }
+        #win-screen h1 {
+            color: #d62828;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .btn-restart {
+            margin-top: 20px;
+            background: #007a3d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-restart:hover {
+            background: #005a2d;
+        }
+        /* File Input Bar */
+        #file-input-bar {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: flex;
+            gap: 10px;
+        }
+        #file-input-bar label {
+            cursor: pointer;
+            color: #fff;
+            text-decoration: underline;
         }
     </style>
 </head>
-<body class="bg-slate-900 text-white select-none">
+<body>
 
-    <div id="game-container">
-        <!-- Game Canvas -->
-        <canvas id="gameCanvas"></canvas>
+<div id="game-container">
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
 
-        <!-- TOP HUD BAR (For Kids: Big, Clear, Colorful) -->
-        <div id="hud" class="absolute top-3 left-3 right-3 flex justify-between items-center z-10 pointer-events-none">
-            <!-- Left Info: Oman Flags Score -->
-            <div class="flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 border-4 border-amber-600 px-4 py-2 rounded-3xl shadow-xl pointer-events-auto transform hover:scale-105 transition">
-                <span class="text-3xl animate-bounce">🇴🇲</span>
-                <div class="text-slate-900 font-black text-xl md:text-2xl">
-                    الأعلام: <span id="score-display" class="text-red-700">0</span>
-                </div>
-            </div>
-
-            <!-- Middle Badge: Oman Flag Theme -->
-            <div class="hidden sm:flex items-center gap-2 bg-white/95 border-4 border-emerald-600 px-5 py-2 rounded-3xl shadow-xl pointer-events-auto">
-                <span class="text-2xl">❓</span>
-                <span class="text-base md:text-lg font-black text-slate-800">السؤال: <span id="question-progress" class="text-emerald-600 text-xl">0 / 5</span></span>
-            </div>
-
-            <!-- Right Controls: Mute & Custom Asset Modal -->
-            <div class="flex items-center gap-2 pointer-events-auto">
-                <!-- Mobile Questions Progress -->
-                <div class="sm:hidden bg-white/90 border-2 border-emerald-500 px-3 py-1 rounded-2xl text-xs font-black text-emerald-800">
-                    ❓ <span id="question-progress-mobile">0/5</span>
-                </div>
-                <!-- Sound Toggle -->
-                <button id="sound-btn" onclick="toggleAudio()" class="w-12 h-12 bg-white border-4 border-amber-500 rounded-2xl flex items-center justify-center text-amber-600 text-xl shadow-lg active:scale-95 transition">
-                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
-                </button>
-                <!-- Image & Asset Customizer -->
-                <button onclick="openCustomizer()" title="تغيير الصور" class="w-12 h-12 bg-white border-4 border-emerald-500 rounded-2xl flex items-center justify-center text-emerald-600 text-xl shadow-lg active:scale-95 transition">
-                    <i class="fa-solid fa-image"></i>
-                </button>
-            </div>
+    <!-- HUD -->
+    <div id="hud">
+        <div class="hud-card">
+            <span>🇴🇲 الأعلام:</span>
+            <span id="score-val">0</span>
         </div>
-
-        <!-- MOBILE TOUCH CONTROLS (Big Easy Buttons) -->
-        <div id="touch-controls" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none">
-            <!-- Left / Right Movement (Fixed LTR Direction and Correct Arrows) -->
-            <div class="flex gap-4 pointer-events-auto" dir="ltr">
-                <button id="btn-left" class="kid-btn w-20 h-20 rounded-3xl flex items-center justify-center text-amber-800 text-4xl font-extrabold active:bg-amber-200" title="يسار">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button id="btn-right" class="kid-btn w-20 h-20 rounded-3xl flex items-center justify-center text-amber-800 text-4xl font-extrabold active:bg-amber-200" title="يمين">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-            <!-- Jump Button -->
-            <div class="pointer-events-auto">
-                <button id="btn-jump" class="jump-btn w-24 h-24 rounded-3xl flex items-center justify-center text-white text-4xl font-extrabold shadow-2xl">
-                    <i class="fa-solid fa-angles-up"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- START SCREEN OVERLAY -->
-        <div id="start-screen" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-30 p-4 text-center">
-            <div class="max-w-md w-full bg-amber-50 border-8 border-red-500 rounded-3xl p-6 shadow-2xl animate-float relative overflow-hidden">
-                <!-- Omani Flag Decorative Top Bar -->
-                <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-red-600 via-white to-emerald-600"></div>
-
-                <div class="w-28 h-28 mx-auto mt-2 mb-3 bg-white border-4 border-amber-400 rounded-full flex items-center justify-center text-6xl shadow-md overflow-hidden ring-4 ring-red-400/50">
-                    <img id="start-char-preview" src="813.png" onerror="this.onerror=null; this.src='https://placehold.co/120x120/dc2626/ffffff?text=🇴🇲';" class="w-full h-full object-cover" alt="الشخصية">
-                </div>
-
-                <h1 class="text-2xl md:text-3xl font-black text-red-600 mb-1 tracking-wide drop-shadow-sm">
-                    🇴🇲 مغامرة العيد الوطني العُماني 🇴🇲
-                </h1>
-                <p class="text-emerald-700 text-lg font-extrabold mb-5">
-                    العب، تعلّم، واحتفل بعُمان! 🎉
-                </p>
-
-                <div class="space-y-3">
-                    <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:brightness-110 text-white font-black text-2xl rounded-2xl shadow-xl border-b-4 border-emerald-900 active:scale-95 transition flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-play text-3xl"></i>
-                        <span>ابدأ اللعب الآن!</span>
-                    </button>
-                </div>
-
-                <div class="mt-5 pt-3 border-t-2 border-amber-200 text-slate-600 font-extrabold text-sm flex justify-around">
-                    <span>⬅️ يسار | ➡️ يمين</span>
-                    <span>⬆️ Space للقفز</span>
-                </div>
-            </div>
-        </div>
-        <!-- QUIZ MODAL DIALOG FOR KIDS (Positioned higher for comfortable viewport viewing) -->
-        <div id="quiz-modal" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-start justify-center pt-10 sm:pt-16 z-40 p-4">
-            <div class="max-w-md w-full bg-white border-8 border-amber-400 rounded-3xl p-6 shadow-2xl relative text-center pop-in">
-                <!-- Top Ribbon -->
-                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-600 text-white text-lg font-black px-6 py-1.5 rounded-full border-4 border-amber-300 shadow-md flex items-center gap-2">
-                    <span>🇴🇲</span>
-                    <span>سؤال العيد الوطني!</span>
-                </div>
-
-                <div id="modal-q-number" class="text-sm font-black text-slate-500 mt-2 mb-2">السؤال 1 من 5</div>
-
-                <!-- Question Text -->
-                <h2 id="modal-q-text" class="text-xl md:text-2xl font-black text-slate-800 mb-5 bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 leading-snug shadow-inner">
-                    ما اسم بلدنا؟
-                </h2>
-
-                <!-- Options Grid (2 Big Kid Buttons) -->
-                <div id="modal-options" class="grid grid-cols-1 gap-4 mb-3">
-                    <!-- Dynamic Options -->
-                </div>
-
-                <!-- Kid Feedback Message -->
-                <div id="feedback-msg" class="font-black text-xl min-h-[32px]"></div>
-            </div>
-        </div>
-
-        <!-- VICTORY CELEBRATION MODAL -->
-        <div id="victory-modal" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center z-50 p-4 text-center">
-            <div class="max-w-lg w-full bg-amber-50 border-8 border-emerald-500 rounded-3xl p-6 md:p-8 shadow-2xl relative pop-in max-h-[90vh] overflow-y-auto">
-                <!-- Omani Flag Accent -->
-                <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-red-600 via-white to-emerald-600"></div>
-
-                <div class="text-7xl mb-2 animate-bounce">🎆</div>
-                <h2 class="text-3xl md:text-4xl font-black text-emerald-600 mb-1">🎉 مبارك الفوز يا بطل! 🎉</h2>
-                <p class="text-slate-800 font-extrabold text-lg mb-4">
-                    🇴🇲 أتممت مغامرة العيد الوطني العُماني بنجاح باهر! 🇴🇲
-                </p>
-
-                <!-- Detailed Victory Scoreboard -->
-                <div class="bg-white border-4 border-amber-300 rounded-2xl p-4 md:p-5 mb-5 shadow-inner space-y-3 text-right">
-                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-2">
-                        <span class="text-slate-700 font-black text-base md:text-lg">🇴🇲 الأعلام المجمعة:</span>
-                        <span id="final-flags-count" class="text-red-600 font-black text-xl md:text-2xl">0</span>
-                    </div>
-                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-2">
-                        <span class="text-slate-700 font-black text-base md:text-lg">❓ الأسئلة المحلولة بنجاح:</span>
-                        <span id="final-quiz-count" class="text-emerald-600 font-black text-xl md:text-2xl">5 / 5</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-amber-100 p-3 rounded-xl border-2 border-amber-400">
-                        <span class="text-amber-900 font-black text-lg md:text-xl">⭐ المجموع النهائي للنقاط:</span>
-                        <span id="final-score" class="text-3xl md:text-4xl text-red-600 font-black">0</span>
-                    </div>
-                </div>
-
-                <!-- Congratulations Card -->
-                <div class="bg-gradient-to-r from-red-600 via-amber-500 to-emerald-600 text-white p-4 rounded-2xl font-black text-lg shadow-md mb-6 leading-relaxed">
-                    🌟 وسام التميّز الوطني العُماني 🌟
-                    <p class="text-sm font-bold mt-1 text-amber-100">"دام عزّك يا وطن، وكل عام وسلطنة عُمان وشعبها العظيم بخير وأمان!" 🇴🇲✨</p>
-                </div>
-
-                <!-- Action Buttons -->
-                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-red-500 via-red-600 to-emerald-600 hover:brightness-110 text-white font-black text-2xl rounded-2xl shadow-xl border-b-4 border-red-900 transition active:scale-95 flex items-center justify-center gap-3">
-                    🔄 <span>العب مرة أخرى</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- CUSTOM IMAGE / ASSETS UPLOADER MODAL -->
-        <div id="custom-modal" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div class="max-w-md w-full bg-white border-4 border-emerald-500 rounded-3xl p-6 shadow-2xl relative text-slate-800">
-                <div class="flex justify-between items-center mb-4 border-b-2 border-slate-100 pb-2">
-                    <h3 class="text-lg font-black text-emerald-700">🖼️ تخصيص الصور والبيئة</h3>
-                    <button onclick="closeCustomizer()" class="text-slate-400 hover:text-slate-800 text-2xl font-bold">✕</button>
-                </div>
-                
-                <p class="text-xs font-bold text-slate-600 mb-4">تتيح لك هذه الخانة رفـع صورة شخصية خاصة أو تغيير صورة الخلفية في اللعبة:</p>
-
-                <div class="space-y-4 text-right">
-                    <div>
-                        <label class="block text-xs font-black text-slate-700 mb-1">صورة الشخصية (البطل):</label>
-                        <input type="file" id="char-upload" accept="image/*" onchange="uploadCharacterImage(event)" class="text-xs file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-amber-100 file:text-amber-800 file:font-bold hover:file:bg-amber-200">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-slate-700 mb-1">صورة الخلفية (البيئة العُمانية):</label>
-                        <input type="file" id="bg-upload" accept="image/*" onchange="uploadBackgroundImage(event)" class="text-xs file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-emerald-800 file:font-bold hover:file:bg-emerald-200">
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <button onclick="closeCustomizer()" class="w-full py-3 bg-emerald-600 text-white font-black rounded-xl shadow-md">تم والحفظ</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TOAST / NOTIFICATION MESSAGE FOR KIDS -->
-        <div id="toast" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-amber-400 border-4 border-white text-slate-900 font-black px-6 py-2 rounded-full shadow-2xl text-lg animate-bounce">
-            <span id="toast-text">⭐ أحسنت!</span>
+        <div class="hud-card">
+            <span>❓ الأسئلة:</span>
+            <span id="quest-val">0 / 5</span>
         </div>
     </div>
 
-    <script>
-        /* ==========================================================================
-           1. AUDIO SYNTHESIZER SYSTEM (Web Audio API - Standalone & Cheerful)
-           ========================================================================== */
-        let audioCtx = null;
-        let isMuted = false;
+    <!-- Touch Controls -->
+    <div id="touch-controls">
+        <div class="control-group">
+            <div class="btn-touch" id="btn-left">➔</div>
+            <div class="btn-touch" id="btn-right">➔</div>
+        </div>
+        <div class="control-group">
+            <div class="btn-touch btn-jump" id="btn-jump">⬆</div>
+        </div>
+    </div>
 
-        function initAudio() {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-            }
-        }
+    <!-- Question Modal -->
+    <div class="modal" id="question-modal">
+        <h2 id="modal-title">سؤال العيد الوطني 🇴🇲</h2>
+        <div class="question-text" id="modal-question">السؤال هنا؟</div>
+        <div class="options-grid" id="modal-options"></div>
+        <div id="feedback-msg"></div>
+    </div>
 
-        function playSound(type) {
-            if (isMuted) return;
-            initAudio();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+    <!-- Win Screen Modal -->
+    <div id="win-screen">
+        <h1>🎉 أحسنت بطل عُمان! 🎉</h1>
+        <p style="font-size:18px; margin: 10px 0;">لقد أكملت مغامرة العيد الوطني العُماني 🇴🇲 بنجاح!</p>
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 15px; margin: 15px 0;">
+            <p style="font-size: 18px; color:#007a3d;"><strong>🇴🇲 الأعلام المجمعة:</strong> <span id="final-flags">0</span></p>
+            <p style="font-size: 18px; color:#d62828;"><strong>❓ الأسئلة المجابة:</strong> 5 / 5</p>
+            <p style="font-size: 20px; color:#333; margin-top:5px;"><strong>⭐ المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</p>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
+    </div>
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+    <!-- Fallback image upload for local testing -->
+    <div id="file-input-bar">
+        <label>تحميل شخصية (813.png): <input type="file" id="char-file" accept="image/*"></label>
+        <label>تحميل خلفية (814.webp): <input type="file" id="bg-file" accept="image/*"></label>
+    </div>
+</div>
 
-            if (type === 'jump') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.exponentialRampToValueAtTime(550, now + 0.18);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
-                osc.start(now);
-                osc.stop(now + 0.18);
-            } else if (type === 'star') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(1046.50, now); // C6
-                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
-                osc.start(now);
-                osc.stop(now + 0.22);
-            } else if (type === 'correct') {
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, idx) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.connect(g);
-                    g.connect(audioCtx.destination);
-                    o.type = 'sine';
-                    o.frequency.setValueAtTime(freq, now + idx * 0.08);
-                    g.gain.setValueAtTime(0.25, now + idx * 0.08);
-                    g.gain.linearRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
-                    o.start(now + idx * 0.08);
-                    o.stop(now + idx * 0.08 + 0.25);
-                });
-            } else if (type === 'retry') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(330, now);
-                osc.frequency.setValueAtTime(293.66, now + 0.12);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
-            } else if (type === 'victory') {
-                const fanfare = [523.25, 523.25, 659.25, 783.99, 1046.50];
-                const times =   [0,      0.12,   0.24,   0.36,   0.50];
-                fanfare.forEach((freq, idx) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.connect(g);
-                    g.connect(audioCtx.destination);
-                    o.type = 'triangle';
-                    o.frequency.setValueAtTime(freq, now + times[idx]);
-                    g.gain.setValueAtTime(0.3, now + times[idx]);
-                    g.gain.linearRampToValueAtTime(0.01, now + times[idx] + 0.35);
-                    o.start(now + times[idx]);
-                    o.stop(now + times[idx] + 0.35);
-                });
-            }
-        }
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-        function toggleAudio() {
-            isMuted = !isMuted;
-            const icon = document.getElementById('sound-icon');
-            if (isMuted) {
-                icon.className = "fa-solid fa-volume-xmark text-slate-400";
-            } else {
-                icon.className = "fa-solid fa-volume-high text-amber-600";
-                playSound('star');
-            }
-        }
+// Assets Setup
+let charImg = new Image();
+charImg.src = '813.png';
 
-        /* ==========================================================================
-           2. 5 KID-FRIENDLY QUESTIONS (Exact specifications)
-           ========================================================================== */
-        const quizQuestions = [
-            {
-                q: "ما اسم بلدنا؟",
-                options: ["عُمان 🇴🇲", "مصر 🇪🇬"],
-                correct: 0
-            },
-            {
-                q: "ما لون موجود في علم عُمان؟",
-                options: ["الأحمر 🔴", "الأصفر 🟡"],
-                correct: 0
-            },
-            {
-                q: "ماذا نرفع في الاحتفالات الوطنية؟",
-                options: ["علم عُمان 🇴🇲", "كتاب 📖"],
-                correct: 0
-            },
-            {
-                q: "ماذا نشاهد في بعض الاحتفالات؟",
-                options: ["الألعاب النارية 🎆", "الثلج ❄️️"],
-                correct: 0
-            },
-            {
-                q: "ماذا نقول لعُمان في العيد الوطني؟",
-                options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"],
-                correct: 0
-            }
-        ];
+let bgImg = new Image();
+bgImg.src = '814.webp';
 
-        /* ==========================================================================
-           3. SPRITE AND IMAGE HANDLING
-           ========================================================================== */
-        const charImage = new Image();
-        charImage.src = '813.png'; // Updated Omani character sprite
+// Upload handlers for local testing
+document.getElementById('char-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => charImg.src = event.target.result;
+        reader.readAsDataURL(file);
+    }
+});
+document.getElementById('bg-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => bgImg.src = event.target.result;
+        reader.readAsDataURL(file);
+    }
+});
 
-        const defaultBgImg = new Image();
-        defaultBgImg.src = '814.webp'; // Updated Omani national day environment background
+// Questions Data
+const questions = [
+    {
+        q: "ما اسم بلدنا العزيز؟",
+        options: ["عُمان 🇴🇲", "مصر 🇪🇬"],
+        answer: 0
+    },
+    {
+        q: "ما هو اللون الموجود في علم عُمان؟",
+        options: ["الأحمر 🔴", "الأصفر 🟡"],
+        answer: 0
+    },
+    {
+        q: "ماذا نرفع بفخر في الاحتفالات الوطنية؟",
+        options: ["علم عُمان 🇴🇲", "كتاب 📖"],
+        answer: 0
+    },
+    {
+        q: "ماذا نشاهد يزين السماء في الاحتفالات؟",
+        options: ["الألعاب النارية 🎆", "الثلج ❄️"],
+        answer: 0
+    },
+    {
+        q: "ماذا نقول لسلطنة عُمان في عيدها الوطني؟",
+        options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"],
+        answer: 0
+    }
+];
 
-        let customBgImg = defaultBgImg;
+// Audio FX (Web Audio API Synthesizer)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-        function uploadCharacterImage(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    charImage.src = evt.target.result;
-                    document.getElementById('start-char-preview').src = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    if (type === 'jump') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    } else if (type === 'collect') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+    } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+    }
+}
 
-        function uploadBackgroundImage(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const img = new Image();
-                    img.onload = function() {
-                        customBgImg = img;
-                    };
-                    img.src = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+// Game State
+let cameraX = 0;
+let score = 0;
+let answeredCount = 0;
+let isPaused = false;
+let gameFinished = false;
 
-        function openCustomizer() {
-            document.getElementById('custom-modal').classList.remove('hidden');
-        }
+// Player Setup
+const player = {
+    x: 100,
+    y: 300,
+    width: 60,
+    height: 75,
+    vx: 0,
+    vy: 0,
+    speed: 5,
+    jumpPower: -13,
+    gravity: 0.6,
+    grounded: false,
+    facingRight: true,
+    hidden: false
+};
 
-        function closeCustomizer() {
-            document.getElementById('custom-modal').classList.add('hidden');
-        }
+// Platforms Setup
+const platforms = [
+    { x: 0, y: 420, w: 3200, h: 80 }, // Ground
+    { x: 300, y: 320, w: 140, h: 20 },
+    { x: 550, y: 260, w: 140, h: 20 },
+    { x: 900, y: 310, w: 150, h: 20 },
+    { x: 1200, y: 250, w: 160, h: 20 },
+    { x: 1550, y: 320, w: 140, h: 20 },
+    { x: 1850, y: 270, w: 150, h: 20 },
+    { x: 2200, y: 320, w: 160, h: 20 }
+];
 
-        /* ==========================================================================
-           4. GAME ENGINE & LEVEL DESIGN
-           ========================================================================== */
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+// Omani Flags Collectibles
+let flagsList = [
+    { x: 340, y: 270, collected: false },
+    { x: 400, y: 370, collected: false },
+    { x: 600, y: 210, collected: false },
+    { x: 750, y: 370, collected: false },
+    { x: 950, y: 260, collected: false },
+    { x: 1250, y: 200, collected: false },
+    { x: 1400, y: 370, collected: false },
+    { x: 1600, y: 270, collected: false },
+    { x: 1900, y: 220, collected: false },
+    { x: 2250, y: 270, collected: false }
+];
 
-        let gameState = 'START'; // START, PLAYING, QUIZ, VICTORY
-        let cameraX = 0;
-        let score = 0;
-        let activeQuestionIndex = 0;
-        let lastSafeX = 100;
-        let lastSafeY = 300;
-        let pendingGate = null;
+// Questions Points
+let questionTriggers = [
+    { x: 500, qIndex: 0, active: true },
+    { x: 1000, qIndex: 1, active: true },
+    { x: 1500, qIndex: 2, active: true },
+    { x: 2000, qIndex: 3, active: true },
+    { x: 2500, qIndex: 4, active: true }
+];
 
-        const keys = { left: false, right: false, up: false };
+// Castle End Goal
+const castle = {
+    x: 2800,
+    y: 180,
+    w: 260,
+    h: 240,
+    doorX: 2900
+};
 
-        const player = {
-            x: 100,
-            y: 300,
-            width: 54,
-            height: 72,
-            vx: 0,
-            vy: 0,
-            speed: 5.5,
-            jumpPower: -13,
-            gravity: 0.58,
-            isGrounded: false,
-            facing: 'right',
-            bounceY: 0
-        };
-
-        const LEVEL_WIDTH = 3800;
-        let platforms = [];
-        let collectibles = [];
-        let questionGates = [];
-        let particles = [];
-        let fireworks = [];
-        let endGate = null;
-
-        function buildLevel() {
-            platforms = [];
-            collectibles = [];
-            questionGates = [];
-            particles = [];
-            fireworks = [];
-
-            const groundY = canvas.height - 80;
-
-            // Simple contiguous ground for kids with wide easy steps
-            platforms.push({ x: 0, y: groundY, width: 1000, height: 100 });
-            platforms.push({ x: 1080, y: groundY, width: 1100, height: 100 });
-            platforms.push({ x: 2240, y: groundY, width: 1600, height: 100 });
-
-            // Low, simple floating cloud platforms
-            const floatPlats = [
-                { x: 300, y: groundY - 100, w: 160 },
-                { x: 600, y: groundY - 120, w: 180 },
-                { x: 1010, y: groundY - 80, w: 100 }, // Bridge over gap 1
-                { x: 1300, y: groundY - 110, w: 180 },
-                { x: 1650, y: groundY - 130, w: 200 },
-                { x: 2170, y: groundY - 80, w: 100 }, // Bridge over gap 2
-                { x: 2450, y: groundY - 110, w: 180 },
-                { x: 2800, y: groundY - 120, w: 200 },
-                { x: 3200, y: groundY - 100, w: 220 }
-            ];
-
-            floatPlats.forEach(p => {
-                platforms.push({ x: p.x, y: p.y, width: p.w, height: 26, type: 'float' });
-            });
-
-            // Replaced stars with Omani Flags 🇴🇲 all over the level
-            for (let x = 180; x < LEVEL_WIDTH - 400; x += 75) {
-                let yPos = groundY - 50;
-                let nearPlat = floatPlats.find(p => x >= p.x && x <= p.x + p.w);
-                if (nearPlat) yPos = nearPlat.y - 50;
-
-                collectibles.push({
-                    x: x,
-                    y: yPos,
-                    size: 28,
-                    type: 'flag',
-                    collected: false
-                });
-            }
-
-            // 5 Question Gates placed slightly higher (groundY - 145) for crystal-clear visibility
-            const qPositions = [500, 1200, 1850, 2600, 3150];
-            qPositions.forEach((xPos, idx) => {
-                questionGates.push({
-                    id: idx,
-                    x: xPos,
-                    y: groundY - 145,
-                    width: 65,
-                    height: 85,
-                    solved: false
-                });
-            });
-
-            // End Castle Gate
-            endGate = {
-                x: LEVEL_WIDTH - 280,
-                y: groundY - 150,
-                width: 140,
-                height: 150
-            };
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            if (gameState === 'START') buildLevel();
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        /* ==========================================================================
-           5. CONTROLS
-           ========================================================================== */
-        window.addEventListener('keydown', (e) => {
-            if (gameState !== 'PLAYING') return;
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
-            if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w' || e.key === 'W') {
-                if (player.isGrounded) {
-                    player.vy = player.jumpPower;
-                    player.isGrounded = false;
-                    playSound('jump');
-                    createSparkle(player.x + player.width/2, player.y + player.height, '#facc15');
-                }
-            }
+// Fireworks Particle System
+let fireworks = [];
+function createFirework(x, y) {
+    const colors = ['#d62828', '#007a3d', '#ffffff', '#ffb703', '#4cc9f0'];
+    const particleCount = 40;
+    for (let i = 0; i < particleCount; i++) {
+        const angle = (Math.PI * 2 / particleCount) * i;
+        const speed = Math.random() * 5 + 2;
+        fireworks.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            alpha: 1,
+            decay: Math.random() * 0.02 + 0.015,
+            radius: Math.random() * 3 + 2
         });
+    }
+}
 
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
-        });
-
-        function setupTouchControls() {
-            const btnLeft = document.getElementById('btn-left');
-            const btnRight = document.getElementById('btn-right');
-            const btnJump = document.getElementById('btn-jump');
-
-            const bindBtn = (el, action) => {
-                el.addEventListener('touchstart', (e) => { e.preventDefault(); action(true); });
-                el.addEventListener('touchend', (e) => { e.preventDefault(); action(false); });
-                el.addEventListener('mousedown', () => action(true));
-                el.addEventListener('mouseup', () => action(false));
-            };
-
-            bindBtn(btnLeft, (val) => keys.left = val);
-            bindBtn(btnRight, (val) => keys.right = val);
-
-            const doJump = (e) => {
-                if (e) e.preventDefault();
-                if (gameState === 'PLAYING' && player.isGrounded) {
-                    player.vy = player.jumpPower;
-                    player.isGrounded = false;
-                    playSound('jump');
-                    createSparkle(player.x + player.width/2, player.y + player.height, '#facc15');
-                }
-            };
-            btnJump.addEventListener('touchstart', doJump);
-            btnJump.addEventListener('mousedown', doJump);
+function updateFireworks() {
+    for (let i = fireworks.length - 1; i >= 0; i--) {
+        let p = fireworks[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05; // gravity
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+            fireworks.splice(i, 1);
         }
-        setupTouchControls();
+    }
+}
 
-        /* ==========================================================================
-           6. GAMEPLAY LOOP & QUIZ SYSTEM
-           ========================================================================== */
-        function startGame() {
-            initAudio();
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('victory-modal').classList.add('hidden');
-            score = 0;
-            activeQuestionIndex = 0;
-            lastSafeX = 100;
-            lastSafeY = canvas.height - 180;
+function drawFireworks() {
+    fireworks.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x - cameraX, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+}
 
-            player.x = lastSafeX;
-            player.y = lastSafeY;
-            player.vx = 0;
-            player.vy = 0;
+// Input Handling
+const keys = { left: false, right: false, up: false };
 
-            buildLevel();
-            updateHUD();
-            gameState = 'PLAYING';
-            playSound('star');
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowLeft') keys.left = true;
+    if (e.code === 'ArrowRight') keys.right = true;
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+        keys.up = true;
+        jump();
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (e.code === 'ArrowLeft') keys.left = false;
+    if (e.code === 'ArrowRight') keys.right = false;
+    if (e.code === 'Space' || e.code === 'ArrowUp') keys.up = false;
+});
+
+// Touch Inputs
+const btnLeft = document.getElementById('btn-left');
+const btnRight = document.getElementById('btn-right');
+const btnJump = document.getElementById('btn-jump');
+
+// Correct button orientation setup
+btnLeft.style.transform = 'scaleX(-1)'; // Left arrow pointing left
+
+btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
+btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
+btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
+btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
+btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+
+function jump() {
+    if (player.grounded && !isPaused && !gameFinished) {
+        player.vy = player.jumpPower;
+        player.grounded = false;
+        playSound('jump');
+    }
+}
+
+// Question Trigger System
+function checkQuestionTriggers() {
+    questionTriggers.forEach(q => {
+        if (q.active && player.x >= q.x) {
+            q.active = false;
+            openQuestionModal(q.qIndex);
         }
+    });
+}
 
-        function updateHUD() {
-            document.getElementById('score-display').innerText = score;
-            document.getElementById('question-progress').innerText = `${activeQuestionIndex} / 5`;
-            document.getElementById('question-progress-mobile').innerText = `${activeQuestionIndex}/5`;
-        }
+function openQuestionModal(qIndex) {
+    isPaused = true;
+    const modal = document.getElementById('question-modal');
+    const qData = questions[qIndex];
+    document.getElementById('modal-question').innerText = qData.q;
+    const optionsGrid = document.getElementById('modal-options');
+    optionsGrid.innerHTML = '';
+    document.getElementById('feedback-msg').innerText = '';
 
-        function update() {
-            if (gameState !== 'PLAYING') return;
+    qData.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.innerText = opt;
+        btn.onclick = () => handleAnswer(idx, qData.answer);
+        optionsGrid.appendChild(btn);
+    });
 
-            // Movement
-            if (keys.left) {
-                player.vx = -player.speed;
-                player.facing = 'left';
-            } else if (keys.right) {
-                player.vx = player.speed;
-                player.facing = 'right';
-            } else {
-                player.vx *= 0.7;
-            }
+    modal.style.display = 'block';
+}
 
-            player.x += player.vx;
-            if (player.x < 0) player.x = 0;
-            if (player.x > LEVEL_WIDTH - player.width) player.x = LEVEL_WIDTH - player.width;
+function handleAnswer(selected, correct) {
+    const feedback = document.getElementById('feedback-msg');
+    if (selected === correct) {
+        feedback.style.color = '#007a3d';
+        feedback.innerText = '🎉 أحسنت! إجابة صحيحة!';
+        playSound('correct');
+        score += 5;
+        answeredCount++;
+        updateHUD();
+        setTimeout(() => {
+            document.getElementById('question-modal').style.display = 'none';
+            isPaused = false;
+        }, 1200);
+    } else {
+        feedback.style.color = '#d62828';
+        feedback.innerText = '😊 حاول مرة أخرى!';
+        playSound('wrong');
+    }
+}
 
-            // Gravity
-            player.vy += player.gravity;
-            player.y += player.vy;
-            player.isGrounded = false;
+function updateHUD() {
+    document.getElementById('score-val').innerText = score;
+    document.getElementById('quest-val').innerText = `${answeredCount} / 5`;
+}
 
-            // Platform collision
-            platforms.forEach(p => {
-                if (player.x + player.width > p.x &&
-                    player.x < p.x + p.width &&
-                    player.y + player.height >= p.y &&
-                    player.y + player.height - player.vy <= p.y + 14 &&
-                    player.vy >= 0) {
+// Game Loop Functions
+function update() {
+    if (isPaused) return;
 
-                    player.y = p.y - player.height;
-                    player.vy = 0;
-                    player.isGrounded = true;
+    // Horizonal Movement
+    if (keys.left) {
+        player.vx = -player.speed;
+        player.facingRight = false;
+    } else if (keys.right) {
+        player.vx = player.speed;
+        player.facingRight = true;
+    } else {
+        player.vx = 0;
+    }
 
-                    // Update last safe ground position for fall recovery
-                    lastSafeX = player.x;
-                    lastSafeY = player.y;
-                }
-            });
+    // Apply Gravity
+    player.vy += player.gravity;
 
-            // Smooth kid-friendly fall recovery (No Game Over!)
-            if (player.y > canvas.height + 60) {
-                player.x = lastSafeX;
-                player.y = lastSafeY - 10;
-                player.vx = 0;
+    // Apply Velocity
+    player.x += player.vx;
+    player.y += player.vy;
+
+    // Prevent moving back past left wall
+    if (player.x < 10) player.x = 10;
+
+    // Platform Collisions
+    player.grounded = false;
+    platforms.forEach(plat => {
+        if (player.x < plat.x + plat.w &&
+            player.x + player.width > plat.x &&
+            player.y + player.height >= plat.y &&
+            player.y + player.height <= plat.y + plat.h + player.vy) {
+            
+            if (player.vy >= 0) {
+                player.grounded = true;
                 player.vy = 0;
-                showToast("✨ أعدت البداية بكل سهولة!");
-            }
-
-            // Collectibles logic
-            collectibles.forEach(item => {
-                if (!item.collected) {
-                    let dx = (player.x + player.width/2) - item.x;
-                    let dy = (player.y + player.height/2) - item.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < player.width/2 + item.size/2) {
-                        item.collected = true;
-                        score += 10;
-                        playSound('star');
-                        createSparkle(item.x, item.y, '#f59e0b');
-                        updateHUD();
-                    }
-                }
-            });
-
-            // Question Gate Collision
-            questionGates.forEach(gate => {
-                if (!gate.solved) {
-                    if (player.x + player.width > gate.x &&
-                        player.x < gate.x + gate.width &&
-                        player.y + player.height > gate.y &&
-                        player.y < gate.y + gate.height) {
-
-                        triggerQuizModal(gate);
-                    }
-                }
-            });
-
-            // End Gate Victory Trigger
-            if (player.x + player.width > endGate.x + 30) {
-                triggerVictory();
-            }
-
-            // Continuous fireworks update on victory
-            updateFireworks();
-
-            // Smooth Parallax Camera
-            let targetCamX = player.x - canvas.width * 0.35;
-            cameraX += (targetCamX - cameraX) * 0.08;
-            if (cameraX < 0) cameraX = 0;
-            if (cameraX > LEVEL_WIDTH - canvas.width) cameraX = LEVEL_WIDTH - canvas.width;
-
-            // Particles update
-            updateParticles();
-        }
-
-        function createFirework() {
-            const x = Math.random() * canvas.width;
-            const targetY = 80 + Math.random() * (canvas.height * 0.4);
-            fireworks.push({
-                x: x,
-                y: canvas.height,
-                targetY: targetY,
-                color: ['#dc2626', '#10b981', '#facc15', '#ffffff', '#38bdf8', '#f97316'][Math.floor(Math.random() * 6)],
-                speed: 7 + Math.random() * 5,
-                exploded: false
-            });
-        }
-
-        function updateFireworks() {
-            if (gameState === 'VICTORY' && Math.random() < 0.15) {
-                createFirework();
-            }
-
-            for (let i = fireworks.length - 1; i >= 0; i--) {
-                let f = fireworks[i];
-                if (!f.exploded) {
-                    f.y -= f.speed;
-                    // Firework trail sparkles
-                    particles.push({
-                        x: f.x,
-                        y: f.y,
-                        vx: (Math.random() - 0.5) * 1.5,
-                        vy: Math.random() * 2 + 1,
-                        size: 3,
-                        color: '#fef08a',
-                        life: 12
-                    });
-
-                    if (f.y <= f.targetY) {
-                        f.exploded = true;
-                        playSound('star');
-                        // Explode in vivid radial burst
-                        const count = 40 + Math.floor(Math.random() * 25);
-                        for (let j = 0; j < count; j++) {
-                            const angle = (Math.PI * 2 / count) * j + Math.random() * 0.1;
-                            const speed = 2 + Math.random() * 6;
-                            particles.push({
-                                x: f.x,
-                                y: f.y,
-                                vx: Math.cos(angle) * speed,
-                                vy: Math.sin(angle) * speed,
-                                size: Math.random() * 5 + 3,
-                                color: f.color,
-                                life: 45 + Math.floor(Math.random() * 20),
-                                gravity: 0.12
-                            });
-                        }
-                    }
-                } else {
-                    fireworks.splice(i, 1);
-                }
+                player.y = plat.y - player.height;
             }
         }
+    });
 
-        function triggerQuizModal(gate) {
-            gameState = 'QUIZ';
-            pendingGate = gate;
-            const qData = quizQuestions[activeQuestionIndex % quizQuestions.length];
+    // Auto recovery if fell below
+    if (player.y > canvas.height + 50) {
+        player.x = Math.max(100, player.x - 200);
+        player.y = 200;
+        player.vy = 0;
+    }
 
-            document.getElementById('modal-q-number').innerText = `السؤال ${activeQuestionIndex + 1} من 5`;
-            document.getElementById('modal-q-text').innerText = qData.q;
-            document.getElementById('feedback-msg').innerText = '';
-
-            const optsContainer = document.getElementById('modal-options');
-            optsContainer.innerHTML = '';
-
-            qData.options.forEach((optText, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full py-4 px-5 bg-amber-400 hover:bg-amber-300 border-4 border-amber-600 text-slate-900 font-black text-xl md:text-2xl rounded-2xl transition shadow-lg active:scale-95 flex items-center justify-between";
-                btn.innerHTML = `<span>${optText}</span><span class="text-3xl">👉</span>`;
-                btn.onclick = () => checkQuizAnswer(idx, qData.correct, btn);
-                optsContainer.appendChild(btn);
-            });
-
-            document.getElementById('quiz-modal').classList.remove('hidden');
-        }
-
-        function checkQuizAnswer(selectedIdx, correctIdx, btnEl) {
-            if (selectedIdx === correctIdx) {
-                playSound('correct');
-                btnEl.className = "w-full py-4 px-5 bg-emerald-500 border-4 border-emerald-700 text-white font-black text-xl md:text-2xl rounded-2xl shadow-lg flex items-center justify-between";
-                btnEl.innerHTML = `<span>${btnEl.innerText}</span><span class="text-3xl">🎉</span>`;
-                
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 animate-pulse">🎉 أحسنت! إجابة صحيحة ⭐</span>`;
-
-                setTimeout(() => {
-                    score += 50;
-                    activeQuestionIndex++;
-                    if (pendingGate) pendingGate.solved = true;
-                    updateHUD();
-                    document.getElementById('quiz-modal').classList.add('hidden');
-                    gameState = 'PLAYING';
-                    showToast("🎉 ممتاز! واصل المغامرة الرائعة!");
-                }, 1100);
-            } else {
-                playSound('retry');
-                btnEl.className = "w-full py-4 px-5 bg-amber-200 border-4 border-amber-400 text-amber-900 font-black text-xl md:text-2xl rounded-2xl flex items-center justify-between opacity-80";
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-amber-700">😊 حاول مرة أخرى!</span>`;
+    // Check Omani Flags Collection
+    flagsList.forEach(flag => {
+        if (!flag.collected) {
+            if (player.x < flag.x + 30 &&
+                player.x + player.width > flag.x &&
+                player.y < flag.y + 30 &&
+                player.y + player.height > flag.y) {
+                flag.collected = true;
+                score += 1;
+                updateHUD();
+                playSound('collect');
             }
         }
+    });
 
-        function triggerVictory() {
-            if (gameState === 'VICTORY') return;
-            gameState = 'VICTORY';
-            playSound('victory');
+    // Camera follow player
+    cameraX = player.x - canvas.width / 3;
+    if (cameraX < 0) cameraX = 0;
 
-            const collectedFlags = collectibles.filter(c => c.collected).length;
-            document.getElementById('final-flags-count').innerText = `${collectedFlags} 🇴🇲`;
-            document.getElementById('final-quiz-count').innerText = `${activeQuestionIndex} / 5 ❓`;
-            document.getElementById('final-score').innerText = score;
-            
-            document.getElementById('victory-modal').classList.remove('hidden');
-            
-            // Initial celebratory fireworks burst
-            for (let i = 0; i < 8; i++) {
-                setTimeout(createFirework, i * 200);
-            }
+    checkQuestionTriggers();
+
+    // Check Mario style Castle End
+    if (!gameFinished && player.x >= castle.doorX) {
+        triggerWinSequence();
+    }
+
+    if (gameFinished) {
+        updateFireworks();
+        if (Math.random() < 0.1) {
+            createFirework(
+                castle.x + Math.random() * castle.w,
+                castle.y - Math.random() * 100
+            );
+            playSound('win');
         }
+    }
+}
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-text').innerText = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 2200);
+function triggerWinSequence() {
+    gameFinished = true;
+    player.hidden = true; // Enter castle
+    playSound('win');
+
+    // Start fireworks explosions around castle
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            createFirework(
+                castle.x + Math.random() * castle.w,
+                castle.y - Math.random() * 120
+            );
+        }, i * 300);
+    }
+
+    setTimeout(() => {
+        document.getElementById('final-flags').innerText = score - (answeredCount * 5);
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('win-screen').style.display = 'block';
+    }, 2000);
+}
+
+// Drawing Functions
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Draw Background Image (Tiled / Scrolling)
+    if (bgImg.complete && bgImg.naturalWidth !== 0) {
+        let bgWidth = canvas.height * (bgImg.width / bgImg.height);
+        let startTile = Math.floor(cameraX / bgWidth);
+        let endTile = Math.floor((cameraX + canvas.width) / bgWidth) + 1;
+
+        for (let i = startTile; i <= endTile; i++) {
+            ctx.drawImage(bgImg, i * bgWidth - cameraX, 0, bgWidth, canvas.height);
         }
+    } else {
+        // Fallback Gradient
+        let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#a1c4fd');
+        grad.addColorStop(1, '#c2e9fb');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
-        function createSparkle(x, y, color) {
-            for (let i = 0; i < 8; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6,
-                    size: Math.random() * 6 + 3,
-                    color: color,
-                    life: 25
-                });
-            }
+    ctx.save();
+    ctx.translate(-cameraX, 0);
+
+    // 2. Draw Platforms
+    platforms.forEach(p => {
+        ctx.fillStyle = '#007a3d'; // Omani Green
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = '#d62828'; // Omani Red Trim
+        ctx.fillRect(p.x, p.y, p.w, 5);
+    });
+
+    // 3. Draw Collectible Omani Flags 🇴🇲
+    flagsList.forEach(f => {
+        if (!f.collected) {
+            // Draw Omani Flag
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(f.x, f.y, 30, 20);
+            ctx.fillStyle = '#d62828';
+            ctx.fillRect(f.x, f.y, 10, 20);
+            ctx.fillRect(f.x + 10, f.y + 7, 20, 6);
+            ctx.fillStyle = '#007a3d';
+            ctx.fillRect(f.x + 10, f.y + 13, 20, 7);
+            // Flag Pole
+            ctx.fillStyle = '#666';
+            ctx.fillRect(f.x - 3, f.y, 3, 30);
         }
+    });
 
-        function updateParticles() {
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.gravity) p.vy += p.gravity;
-                p.life--;
-                if (p.life <= 0) particles.splice(i, 1);
-            }
+    // 4. Draw Question Points Flags/Gate
+    questionTriggers.forEach(q => {
+        if (q.active) {
+            ctx.fillStyle = '#ffb703';
+            ctx.font = '28px sans-serif';
+            ctx.fillText('❓', q.x, 380);
         }
+    });
 
-        /* ==========================================================================
-           7. CANVAS RENDERING ENGINE
-           ========================================================================== */
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 5. Draw Omani Castle at Goal (Nizwa Style Fort)
+    drawOmaniCastle(castle.x, castle.y, castle.w, castle.h);
 
-            // A. BACKGROUND
-            drawBackground();
-
-            // B. PLATFORMS
-            drawPlatforms();
-
-            // C. QUESTION GATES
-            drawQuestionGates();
-
-            // D. COLLECTIBLES
-            drawCollectibles();
-
-            // E. END CASTLE
-            drawEndCastle();
-
-            // F. PLAYER CHARACTER
-            drawPlayer();
-
-            // G. PARTICLES & FIREWORKS
-            drawParticles();
-        }
-
-        function drawBackground() {
-            if (customBgImg && customBgImg.complete && customBgImg.naturalWidth > 0) {
-                let bgW = canvas.width;
-                let bgOffset = -(cameraX * 0.3) % bgW;
-                ctx.drawImage(customBgImg, bgOffset, 0, bgW, canvas.height);
-                ctx.drawImage(customBgImg, bgOffset + bgW, 0, bgW, canvas.height);
-                return;
-            }
-
-            // Cheerful Cartoon Omani Sky & Mountains
-            let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            skyGrad.addColorStop(0, '#38bdf8');
-            skyGrad.addColorStop(0.7, '#bae6fd');
-            skyGrad.addColorStop(1, '#fef08a');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Sun
-            ctx.fillStyle = '#facc15';
-            ctx.beginPath();
-            ctx.arc(canvas.width - 120, 100, 50, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Festive Omani Mountain Hills
-            ctx.fillStyle = '#0284c7';
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height);
-            for (let i = 0; i <= canvas.width + 100; i += 100) {
-                let worldX = i + cameraX * 0.2;
-                let mY = canvas.height - 160 - Math.sin(worldX * 0.003) * 60;
-                ctx.lineTo(i, mY);
-            }
-            ctx.lineTo(canvas.width, canvas.height);
-            ctx.fill();
-
-            ctx.fillStyle = '#0369a1';
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height);
-            for (let i = 0; i <= canvas.width + 80; i += 80) {
-                let worldX = i + cameraX * 0.4;
-                let mY = canvas.height - 110 - Math.cos(worldX * 0.005) * 40;
-                ctx.lineTo(i, mY);
-            }
-            ctx.lineTo(canvas.width, canvas.height);
-            ctx.fill();
-        }
-
-        function drawPlatforms() {
-            platforms.forEach(p => {
-                let screenX = p.x - cameraX;
-                if (screenX + p.width < -50 || screenX > canvas.width + 50) return;
-
-                if (!p.type) {
-                    // Main Ground (Red & Emerald Omani colors accents)
-                    ctx.fillStyle = '#15803d'; // Emerald green top
-                    ctx.fillRect(screenX, p.y, p.width, 16);
-
-                    ctx.fillStyle = '#b45309'; // Warm terracotta stone
-                    ctx.fillRect(screenX, p.y + 16, p.width, p.height - 16);
-
-                    // Decorative flag trim
-                    ctx.fillStyle = '#dc2626';
-                    ctx.fillRect(screenX, p.y, p.width, 4);
-                } else {
-                    // Kid Cloud Floating Platform
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.roundRect(screenX, p.y, p.width, p.height, 14);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-                }
-            });
-        }
-
-        function drawQuestionGates() {
-            questionGates.forEach(gate => {
-                let screenX = gate.x - cameraX;
-                if (screenX + gate.width < -50 || screenX > canvas.width + 50) return;
-
-                if (!gate.solved) {
-                    let floatY = gate.y + Math.sin(Date.now() * 0.005 + gate.id) * 8;
-
-                    // Elevated Glowing Gift Question Gate Block
-                    ctx.fillStyle = '#dc2626';
-                    ctx.beginPath();
-                    ctx.roundRect(screenX, floatY, gate.width, gate.height, 18);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#facc15';
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-
-                    // Inner Glow ring
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 38px Cairo';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('❓', screenX + gate.width/2, floatY + 54);
-                }
-            });
-        }
-
-        function drawCollectibles() {
-            collectibles.forEach(item => {
-                if (item.collected) return;
-                let screenX = item.x - cameraX;
-                if (screenX < -50 || screenX > canvas.width + 50) return;
-
-                let floatY = item.y + Math.sin(Date.now() * 0.006 + item.x) * 6;
-
-                // Glowing halo around Oman flag
-                ctx.fillStyle = 'rgba(254, 240, 138, 0.45)';
-                ctx.beginPath();
-                ctx.arc(screenX, floatY - 8, 22, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Oman Flag or Star collectible
-                ctx.font = '30px Cairo';
-                ctx.textAlign = 'center';
-                ctx.fillText(item.type === 'flag' ? '🇴🇲' : '⭐', screenX, floatY);
-            });
-        }
-
-        function drawEndCastle() {
-            let screenX = endGate.x - cameraX;
-            if (screenX + endGate.width < -200 || screenX > canvas.width + 200) return;
-
-            const cX = screenX;
-            const cY = endGate.y - 30; 
-            const cW = endGate.width + 40;
-            const cH = endGate.height + 30;
-
+    // 6. Draw Player Character (813.png)
+    if (!player.hidden) {
+        if (charImg.complete && charImg.naturalWidth !== 0) {
             ctx.save();
-
-            // Shadow under castle
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-            ctx.beginPath();
-            ctx.ellipse(cX + cW/2, cY + cH, cW/2 + 20, 12, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Main Central Fortress Wall (Omani Sandstone)
-            let wallGrad = ctx.createLinearGradient(cX, cY, cX + cW, cY);
-            wallGrad.addColorStop(0, '#d97706');
-            wallGrad.addColorStop(0.5, '#f59e0b');
-            wallGrad.addColorStop(1, '#b45309');
-
-            ctx.fillStyle = wallGrad;
-            ctx.beginPath();
-            ctx.roundRect(cX + 20, cY + 30, cW - 40, cH - 30, [12, 12, 0, 0]);
-            ctx.fill();
-
-            // Side Round Fort Turrets (Nizwa style)
-            ctx.fillStyle = '#b45309';
-            ctx.beginPath();
-            ctx.roundRect(cX - 12, cY + 10, 48, cH - 10, [16, 16, 0, 0]);
-            ctx.fill();
-
-            ctx.fillStyle = '#92400e';
-            ctx.beginPath();
-            ctx.roundRect(cX + cW - 36, cY + 10, 48, cH - 10, [16, 16, 0, 0]);
-            ctx.fill();
-
-            // Traditional Omani Wall Battlements / Crenellations
-            const drawCrenellations = (x, y, width) => {
-                ctx.fillStyle = '#78350f';
-                const count = 5;
-                const step = width / count;
-                for (let i = 0; i < count; i++) {
-                    if (i % 2 === 0) {
-                        ctx.fillRect(x + i * step, y - 10, step, 10);
-                    }
-                }
-            };
-            drawCrenellations(cX - 12, cY + 10, 48);
-            drawCrenellations(cX + cW - 36, cY + 10, 48);
-            drawCrenellations(cX + 20, cY + 30, cW - 40);
-
-            // Arched Loophole Windows
-            ctx.fillStyle = '#451a03';
-            ctx.beginPath();
-            ctx.arc(cX + 12, cY + 45, 6, Math.PI, 0);
-            ctx.fillRect(cX + 6, cY + 45, 12, 14);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(cX + cW - 12, cY + 45, 6, Math.PI, 0);
-            ctx.fillRect(cX + cW - 18, cY + 45, 12, 14);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(cX + cW/2 - 25, cY + 55, 7, Math.PI, 0);
-            ctx.fillRect(cX + cW/2 - 32, cY + 55, 14, 16);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(cX + cW/2 + 25, cY + 55, 7, Math.PI, 0);
-            ctx.fillRect(cX + cW/2 + 18, cY + 55, 14, 16);
-            ctx.fill();
-
-            // Grand Omani Fort Arch Wooden Gate
-            const doorX = cX + cW/2 - 28;
-            const doorY = cY + cH - 60;
-            const doorW = 56;
-            const doorH = 60;
-
-            // Outer Arch Frame
-            ctx.fillStyle = '#78350f';
-            ctx.beginPath();
-            ctx.arc(cX + cW/2, doorY, doorW/2 + 6, Math.PI, 0);
-            ctx.fillRect(doorX - 6, doorY, doorW + 12, doorH);
-            ctx.fill();
-
-            // Wooden Door Base
-            ctx.fillStyle = '#451a03';
-            ctx.beginPath();
-            ctx.arc(cX + cW/2, doorY, doorW/2, Math.PI, 0);
-            ctx.fillRect(doorX, doorY, doorW, doorH);
-            ctx.fill();
-
-            // Brass Studs & Center Planks
-            ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(cX + cW/2, doorY - doorW/2);
-            ctx.lineTo(cX + cW/2, doorY + doorH);
-            ctx.stroke();
-
-            ctx.fillStyle = '#facc15';
-            [doorY + 10, doorY + 25, doorY + 42].forEach(sy => {
-                ctx.beginPath();
-                ctx.arc(doorX + 12, sy, 2.5, 0, Math.PI * 2);
-                ctx.arc(doorX + doorW - 12, sy, 2.5, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // Waving Flags atop Castle Towers & Dome
-            ctx.font = '36px Cairo';
-            ctx.textAlign = 'center';
-            ctx.fillText('🇴🇲', cX + 12, cY - 12);
-            ctx.fillText('🇴🇲', cX + cW - 12, cY - 12);
-            ctx.font = '48px Cairo';
-            ctx.fillText('🇴🇲', cX + cW/2, cY + 5);
-
-            ctx.restore();
-        }
-
-        function drawPlayer() {
-            let screenX = player.x - cameraX;
-            let drawY = player.y;
-
-            // Subtle running bounce
-            if (Math.abs(player.vx) > 0.5 && player.isGrounded) {
-                drawY += Math.sin(Date.now() * 0.015) * 3;
-            }
-
-            ctx.save();
-
-            // Mirror character sprite when moving left
-            if (player.facing === 'left') {
-                ctx.translate(screenX + player.width, drawY);
+            if (!player.facingRight) {
+                ctx.translate(player.x + player.width, player.y);
                 ctx.scale(-1, 1);
-                screenX = 0;
-                drawY = 0;
-            }
-
-            if (charImage.complete && charImage.naturalWidth > 0) {
-                // Draw provided character sprite image
-                ctx.drawImage(charImage, screenX, drawY, player.width, player.height);
+                ctx.drawImage(charImg, 0, 0, player.width, player.height);
             } else {
-                // Fallback charming Omani child avatar
-                ctx.fillStyle = '#dc2626';
-                ctx.beginPath();
-                ctx.roundRect(screenX + 6, drawY + 22, player.width - 12, player.height - 22, 12);
-                ctx.fill();
-
-                ctx.fillStyle = '#fbcfe8';
-                ctx.beginPath();
-                ctx.arc(screenX + player.width/2, drawY + 16, 14, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#10b981';
-                ctx.fillRect(screenX + player.width/2 - 12, drawY + 2, 24, 8);
+                ctx.drawImage(charImg, player.x, player.y, player.width, player.height);
             }
-
             ctx.restore();
+        } else {
+            // Fallback Character
+            ctx.fillStyle = '#d62828';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
         }
+    }
 
-        function drawParticles() {
-            particles.forEach(p => {
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
+    // 7. Draw Fireworks Particles
+    if (gameFinished) {
+        drawFireworks();
+    }
 
-            // Draw ascending firework rockets
-            fireworks.forEach(f => {
-                if (!f.exploded) {
-                    ctx.fillStyle = f.color;
-                    ctx.beginPath();
-                    ctx.arc(f.x - cameraX, f.y, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-        }
+    ctx.restore();
+}
 
-        function gameLoop() {
-            update();
-            render();
-            requestAnimationFrame(gameLoop);
-        }
+// Omani Castle Fort Drawing
+function drawOmaniCastle(x, y, w, h) {
+    // Main Structure
+    ctx.fillStyle = '#d4a373';
+    ctx.fillRect(x, y, w, h);
 
-        window.onload = function() {
-            buildLevel();
-            requestAnimationFrame(gameLoop);
-        };
-    </script>
+    // Battlements
+    ctx.fillStyle = '#bc6c25';
+    for (let i = 0; i < w; i += 30) {
+        ctx.fillRect(x + i, y - 15, 18, 15);
+    }
+
+    // Main Towers
+    ctx.fillRect(x - 20, y - 30, 45, h + 30);
+    ctx.fillRect(x + w - 25, y - 30, 45, h + 30);
+
+    // Tower battlements
+    for (let i = -20; i < 25; i += 20) {
+        ctx.fillRect(x + i, y - 45, 12, 15);
+        ctx.fillRect(x + w - 25 + (i + 20), y - 45, 12, 15);
+    }
+
+    // Arched Doorway (Mario Exit)
+    ctx.fillStyle = '#2b2d42';
+    ctx.beginPath();
+    ctx.arc(x + w / 2, y + h - 40, 30, Math.PI, 0, false);
+    ctx.rect(x + w / 2 - 30, y + h - 40, 60, 40);
+    ctx.fill();
+
+    // Large Omani Flag on Castle Top
+    ctx.fillStyle = '#8d99ae';
+    ctx.fillRect(x + w / 2 - 2, y - 80, 4, 75);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + w / 2 + 2, y - 80, 40, 25);
+    ctx.fillStyle = '#d62828';
+    ctx.fillRect(x + w / 2 + 2, y - 80, 12, 25);
+    ctx.fillRect(x + w / 2 + 14, y - 72, 28, 8);
+    ctx.fillStyle = '#007a3d';
+    ctx.fillRect(x + w / 2 + 14, y - 64, 28, 9);
+}
+
+// Main Game Loop
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+function restartGame() {
+    player.x = 100;
+    player.y = 300;
+    player.vx = 0;
+    player.vy = 0;
+    player.hidden = false;
+    score = 0;
+    answeredCount = 0;
+    gameFinished = false;
+    isPaused = false;
+    fireworks = [];
+
+    flagsList.forEach(f => f.collected = false);
+    questionTriggers.forEach(q => q.active = true);
+
+    updateHUD();
+    document.getElementById('win-screen').style.display = 'none';
+    document.getElementById('question-modal').style.display = 'none';
+}
+
+// Start Game
+loop();
+</script>
 </body>
 </html>
