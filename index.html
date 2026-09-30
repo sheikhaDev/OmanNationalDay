@@ -6,23 +6,23 @@
     <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
-        body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: manipulation; direction: rtl; }
+        body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
         #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #000; }
         canvas { background-color: #87CEEB; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); max-width: 100%; max-height: 100%; }
         #hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 10; }
         .hud-card { background: rgba(255, 255, 255, 0.95); color: #d62828; padding: 8px 18px; border-radius: 20px; font-size: 20px; font-weight: bold; border: 2px solid #007a3d; display: flex; align-items: center; gap: 8px; }
-        #touch-controls { position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
-        .control-group { display: flex; gap: 15px; pointer-events: auto; }
-        .btn-touch { width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 3px solid #007a3d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; color: #007a3d; cursor: pointer; }
-        .btn-touch:active { background: #007a3d; color: #fff; }
-        .btn-jump { border-color: #d62828; color: #d62828; width: 85px; height: 85px; border-radius: 42px; }
-        .btn-jump:active { background: #d62828; color: #fff; }
-        .modal { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #fff; border: 4px solid #007a3d; border-radius: 20px; padding: 20px; text-align: center; color: #333; z-index: 20; display: none; }
+        #touch-controls { position: absolute; bottom: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
+        .control-group { display: flex; gap: 20px; pointer-events: auto; }
+        .btn-touch { width: 85px; height: 85px; background: rgba(255, 255, 255, 0.85); border: 4px solid #007a3d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #007a3d; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-touch:active, .btn-touch.pressed { background: #007a3d; color: #fff; transform: scale(0.95); }
+        .btn-jump { border-color: #d62828; color: #d62828; width: 95px; height: 95px; border-radius: 50%; }
+        .btn-jump:active, .btn-jump.pressed { background: #d62828; color: #fff; }
+        .modal { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #fff; border: 4px solid #007a3d; border-radius: 20px; padding: 20px; text-align: center; color: #333; z-index: 20; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .modal h2 { color: #d62828; margin-bottom: 15px; }
         .question-text { font-size: 20px; margin-bottom: 20px; font-weight: bold; }
         .btn-option { background: #f8f9fa; border: 2px solid #007a3d; padding: 12px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; margin-bottom: 10px; cursor: pointer; }
         .btn-option:hover { background: #007a3d; color: #fff; }
-        #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #fff; border: 5px solid #d62828; border-radius: 25px; padding: 25px; text-align: center; color: #333; z-index: 30; display: none; }
+        #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #fff; border: 5px solid #d62828; border-radius: 25px; padding: 25px; text-align: center; color: #333; z-index: 30; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .btn-restart { margin-top: 20px; background: #007a3d; color: white; border: none; padding: 12px 30px; font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer; }
     </style>
 </head>
@@ -47,14 +47,14 @@
     </div>
 
     <div class="modal" id="question-modal">
-        <h2 id="modal-title">سؤال العيد الوطني 🇴🇲</h2>
+        <h2>سؤال العيد الوطني 🇴🇲</h2>
         <div class="question-text" id="modal-question"></div>
         <div id="modal-options"></div>
         <div id="feedback-msg" style="margin-top:10px; font-weight:bold;"></div>
     </div>
 
     <div id="win-screen">
-        <h1 style="color:#d62828;">🎉 أحسنت بطل عُمان! 🎉</h1>
+        <h1 style="color:#d62828;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
         <p style="font-size:18px; margin: 10px 0;">أكملت مغامرة العيد الوطني بنجاح!</p>
         <p style="font-size: 20px; color:#007a3d; margin: 15px 0;"><strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</p>
         <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
@@ -65,7 +65,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // تحميل الصور مع حماية في حال عدم توفر الملفات
     let charImg = new Image();
     charImg.src = '813.png';
     let charLoaded = false;
@@ -77,16 +76,17 @@
     bgImg.onload = () => { bgLoaded = true; };
 
     const questions = [
-        { q: "ما اسم بلدنا العزيز؟", options: ["عُمان 🇴🇲", "مصر 🇪🇬"], answer: 0 },
-        { q: "ما هو اللون الموجود في علم عُمان؟", options: ["الأحمر 🔴", "الأصفر 🟡"], answer: 0 },
-        { q: "ماذا نرفع بفخر في الاحتفالات الوطنية؟", options: ["علم عُمان 🇴🇲", "كتاب 📖"], answer: 0 },
-        { q: "ماذا نشاهد يزين السماء في الاحتفالات؟", options: ["الألعاب النارية 🎆", "الثلج ❄️"], answer: 0 },
-        { q: "ماذا نقول لسلطنة عُمان في عيدها الوطني؟", options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"], answer: 0 }
+        { q: "ما اسم بلدنا العزيز؟", options: ["عُمان 🇴🇲", "بلد آخر"], answer: 0 },
+        { q: "ما هو اللون البارز في علم عُمان؟", options: ["الأحمر 🔴", "الأزرق 🔵"], answer: 0 },
+        { q: "ماذا نرفع بفخر في الاحتفالات الوطنية؟", options: ["علم عُمان 🇴🇲", "شئ آخر"], answer: 0 },
+        { q: "ماذا نشاهد يزين السماء في الاحتفالات؟", options: ["الألعاب النارية 🎆", "المطر 🌧️"], answer: 0 },
+        { q: "ماذا نقول لسلطنة عُمان في عيدها الوطني؟", options: ["كل عام وعُمان بخير 🇴🇲", "مرحباً"], answer: 0 }
     ];
 
     let cameraX = 0, score = 0, answeredCount = 0, isPaused = false, gameFinished = false;
 
-    const player = { x: 100, y: 300, width: 60, height: 75, vx: 0, vy: 0, speed: 5, jumpPower: -13, gravity: 0.6, grounded: false, facingRight: true, hidden: false };
+    // حجم الشخصية 813 مكبر ومناسب
+    const player = { x: 100, y: 280, width: 80, height: 95, vx: 0, vy: 0, speed: 5, jumpPower: -13, gravity: 0.6, grounded: false, facingRight: true, hidden: false };
 
     const platforms = [
         { x: 0, y: 420, w: 3200, h: 80 },
@@ -116,23 +116,29 @@
     const castle = { x: 2800, y: 180, w: 260, h: 240, doorX: 2900 };
     let fireworks = [];
 
-    // التحكم
     const keys = { left: false, right: false };
+
     window.addEventListener('keydown', (e) => {
-        if (e.code === 'ArrowLeft') keys.left = true;
-        if (e.code === 'ArrowRight') keys.right = true;
-        if (e.code === 'Space' || e.code === 'ArrowUp') jump();
+        if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+        if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+        if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') jump();
     });
     window.addEventListener('keyup', (e) => {
-        if (e.code === 'ArrowLeft') keys.left = false;
-        if (e.code === 'ArrowRight') keys.right = false;
+        if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
     });
 
-    document.getElementById('btn-left').addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
-    document.getElementById('btn-left').addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
-    document.getElementById('btn-right').addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
-    document.getElementById('btn-right').addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
-    document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+    function bindButton(id, actionPress, actionRelease) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('pointerdown', (e) => { e.preventDefault(); el.classList.add('pressed'); actionPress(); });
+        el.addEventListener('pointerup', (e) => { e.preventDefault(); el.classList.remove('pressed'); actionRelease(); });
+        el.addEventListener('pointerleave', (e) => { e.preventDefault(); el.classList.remove('pressed'); actionRelease(); });
+    }
+
+    bindButton('btn-left', () => { keys.left = true; }, () => { keys.left = false; });
+    bindButton('btn-right', () => { keys.right = true; }, () => { keys.right = false; });
+    bindButton('btn-jump', () => { jump(); }, () => {});
 
     function jump() {
         if (player.grounded && !isPaused && !gameFinished) {
@@ -144,6 +150,7 @@
     function openQuestionModal(qIndex) {
         isPaused = true;
         player.vx = 0;
+        keys.left = false; keys.right = false;
         const qData = questions[qIndex];
         document.getElementById('modal-question').innerText = qData.q;
         const optionsDiv = document.getElementById('modal-options');
@@ -156,7 +163,6 @@
             btn.innerText = opt;
             btn.onclick = () => {
                 if (idx === qData.answer) {
-                    document.getElementById('feedback-msg.').innerText = "";
                     document.getElementById('feedback-msg').style.color = '#007a3d';
                     document.getElementById('feedback-msg').innerText = '🎉 أحسنت! إجابة صحيحة!';
                     score += 5; answeredCount++;
@@ -201,8 +207,8 @@
 
         if (!gameFinished) {
             flagsList.forEach(flag => {
-                if (!flag.collected && player.x < flag.x + 30 && player.x + player.width > flag.x &&
-                    player.y < flag.y + 30 && player.y + player.height > flag.y) {
+                if (!flag.collected && player.x < flag.x + 35 && player.x + player.width > flag.x &&
+                    player.y < flag.y + 35 && player.y + player.height > flag.y) {
                     flag.collected = true; score += 1;
                     document.getElementById('score-val').innerText = score;
                 }
@@ -254,12 +260,15 @@
             ctx.fillStyle = '#d62828'; ctx.fillRect(p.x, p.y, p.w, 5);
         });
 
+        // رسم علم سلطنة عُمان (🇴🇲) بشكل جميل وواضح في مسار اللعبة
         flagsList.forEach(f => {
             if (!f.collected) {
-                ctx.fillStyle = '#fff'; ctx.fillRect(f.x, f.y, 30, 20);
-                ctx.fillStyle = '#d62828'; ctx.fillRect(f.x, f.y, 10, 20);
-                ctx.fillStyle = '#007a3d'; ctx.fillRect(f.x+10, f.y+13, 20, 7);
-                ctx.fillStyle = '#666'; ctx.fillRect(f.x-3, f.y, 3, 30);
+                ctx.save();
+                ctx.font = '32px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🇴🇲', f.x + 15, f.y + 15);
+                ctx.restore();
             }
         });
 
@@ -272,13 +281,25 @@
         ctx.fillStyle = '#bc6c25';
         for (let i = 0; i < castle.w; i += 30) ctx.fillRect(castle.x + i, castle.y - 15, 18, 15);
 
-        // اللاعب
+        // اللاعب (الصورة 813)
         if (!player.hidden) {
-            if (charLoaded) {
-                ctx.drawImage(charImg, player.x, player.y, player.width, player.height);
+            ctx.save();
+            if (!player.facingRight) {
+                ctx.translate(player.x + player.width, player.y);
+                ctx.scale(-1, 1);
+                if (charLoaded) {
+                    ctx.drawImage(charImg, 0, 0, player.width, player.height);
+                } else {
+                    ctx.fillStyle = '#d62828'; ctx.fillRect(0, 0, player.width, player.height);
+                }
             } else {
-                ctx.fillStyle = '#d62828'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                if (charLoaded) {
+                    ctx.drawImage(charImg, player.x, player.y, player.width, player.height);
+                } else {
+                    ctx.fillStyle = '#d62828'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                }
             }
+            ctx.restore();
         }
 
         fireworks.forEach(p => {
@@ -292,7 +313,7 @@
     function loop() { update(); draw(); requestAnimationFrame(loop); }
 
     function restartGame() {
-        player.x = 100; player.y = 300; player.vx = 0; player.vy = 0;
+        player.x = 100; player.y = 280; player.vx = 0; player.vy = 0;
         player.hidden = false; score = 0; answeredCount = 0;
         gameFinished = false; isPaused = false; fireworks = [];
         flagsList.forEach(f => f.collected = false);
