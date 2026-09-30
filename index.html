@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
+    <title>مغامرات عمانية🇴🇲</title>
     <style>
+        /* =========================================
+           الإعدادات العامة والخطوط
+           ========================================= */
         * {
             box-sizing: border-box;
             user-select: none;
@@ -35,7 +38,10 @@
             max-width: 100%;
             max-height: 100%;
         }
-        /* Top HUD */
+
+        /* =========================================
+           واجهة المستخدم العلوية (النقاط)
+           ========================================= */
         #hud {
             position: absolute;
             top: 15px;
@@ -48,7 +54,7 @@
             z-index: 10;
         }
         .hud-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             color: #d62828;
             padding: 8px 18px;
             border-radius: 20px;
@@ -60,7 +66,10 @@
             align-items: center;
             gap: 8px;
         }
-        /* Touch Controls */
+
+        /* =========================================
+           أزرار التحكم باللمس
+           ========================================= */
         #touch-controls {
             position: absolute;
             bottom: 20px;
@@ -89,7 +98,7 @@
             color: #007a3d;
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
             cursor: pointer;
-            active-scale: 0.95;
+            transition: transform 0.1s;
         }
         .btn-touch:active {
             transform: scale(0.92);
@@ -107,7 +116,10 @@
             background: #d62828;
             color: #fff;
         }
-        /* Modal Window for Questions */
+
+        /* =========================================
+           نوافذ الأسئلة والنهاية
+           ========================================= */
         .modal {
             position: absolute;
             top: 10%;
@@ -161,7 +173,6 @@
             font-weight: bold;
             min-height: 25px;
         }
-        /* Win Screen */
         #win-screen {
             position: absolute;
             top: 50%;
@@ -195,11 +206,15 @@
             border-radius: 30px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background 0.2s;
         }
         .btn-restart:hover {
             background: #005a2d;
         }
-        /* File Input Bar */
+
+        /* =========================================
+           شريط رفع الصور (للتجربة المحلية)
+           ========================================= */
         #file-input-bar {
             position: absolute;
             bottom: 5px;
@@ -225,7 +240,7 @@
 <div id="game-container">
     <canvas id="gameCanvas" width="900" height="500"></canvas>
 
-    <!-- HUD -->
+    <!-- شريط النقاط العلوي -->
     <div id="hud">
         <div class="hud-card">
             <span>🇴🇲 الأعلام:</span>
@@ -237,7 +252,7 @@
         </div>
     </div>
 
-    <!-- Touch Controls -->
+    <!-- أزرار التحكم -->
     <div id="touch-controls">
         <div class="control-group">
             <div class="btn-touch" id="btn-left">➔</div>
@@ -248,7 +263,7 @@
         </div>
     </div>
 
-    <!-- Question Modal -->
+    <!-- نافذة الأسئلة -->
     <div class="modal" id="question-modal">
         <h2 id="modal-title">سؤال العيد الوطني 🇴🇲</h2>
         <div class="question-text" id="modal-question">السؤال هنا؟</div>
@@ -256,7 +271,7 @@
         <div id="feedback-msg"></div>
     </div>
 
-    <!-- Win Screen Modal -->
+    <!-- شاشة الفوز والنهاية -->
     <div id="win-screen">
         <h1>🎉 أحسنت بطل عُمان! 🎉</h1>
         <p style="font-size:18px; margin: 10px 0;">لقد أكملت مغامرة العيد الوطني العُماني 🇴🇲 بنجاح!</p>
@@ -268,600 +283,561 @@
         <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
     </div>
 
-    <!-- Fallback image upload for local testing -->
+    <!-- شريط رفع الصور يدويًا (يُستخدم في حالة عدم عمل السيرفر المحلي) -->
     <div id="file-input-bar">
-        <label>تحميل شخصية (813.png): <input type="file" id="char-file" accept="image/*"></label>
-        <label>تحميل خلفية (814.webp): <input type="file" id="bg-file" accept="image/*"></label>
+        <label>تحميل شخصية: <input type="file" id="char-file" accept="image/*" style="display:none;"></label>
+        <label>تحميل خلفية: <input type="file" id="bg-file" accept="image/*" style="display:none;"></label>
     </div>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+    /* =========================================
+       إعدادات المتغيرات الأساسية والرسم
+       ========================================= */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-// Assets Setup
-let charImg = new Image();
-charImg.src = '813.png';
+    // إعدادات الصور
+    let charImg = new Image();
+    charImg.src = '813.png';
 
-let bgImg = new Image();
-bgImg.src = '814.webp';
+    let bgImg = new Image();
+    bgImg.src = '814.webp';
 
-// Upload handlers for local testing
-document.getElementById('char-file').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => charImg.src = event.target.result;
-        reader.readAsDataURL(file);
+    // معالجة رفع الصور يدويًا (للتجربة)
+    document.getElementById('char-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => charImg.src = event.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
+    document.getElementById('bg-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => bgImg.src = event.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
+
+    /* =========================================
+       قاعدة بيانات الأسئلة
+       ========================================= */
+    const questions = [
+        { q: "ما اسم بلدنا العزيز؟", options: ["عُمان 🇴🇲", "مصر 🇪🇬"], answer: 0 },
+        { q: "ما هو اللون الموجود في علم عُمان؟", options: ["الأحمر 🔴", "الأصفر 🟡"], answer: 0 },
+        { q: "ماذا نرفع بفخر في الاحتفالات الوطنية؟", options: ["علم عُمان 🇴🇲", "كتاب 📖"], answer: 0 },
+        { q: "ماذا نشاهد يزين السماء في الاحتفالات؟", options: ["الألعاب النارية 🎆", "الثلج ❄️"], answer: 0 },
+        { q: "ماذا نقول لسلطنة عُمان في عيدها الوطني؟", options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"], answer: 0 }
+    ];
+
+    /* =========================================
+       نظام الصوت المُحسّن (يمنع أخطاء المتصفح)
+       ========================================= */
+    let audioCtx;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
     }
-});
-document.getElementById('bg-file').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => bgImg.src = event.target.result;
-        reader.readAsDataURL(file);
+
+    function playSound(type) {
+        initAudio(); // التأكد من تفعيل الصوت
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'jump') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === 'collect') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now); 
+            osc.frequency.setValueAtTime(659.25, now + 0.08); 
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(880, now + 0.12);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, now);
+            osc.frequency.setValueAtTime(140, now + 0.15);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } else if (type === 'win') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.5);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+            osc.start(now);
+            osc.stop(now + 0.6);
+        }
     }
-});
 
-// Questions Data
-const questions = [
-    {
-        q: "ما اسم بلدنا العزيز؟",
-        options: ["عُمان 🇴🇲", "مصر 🇪🇬"],
-        answer: 0
-    },
-    {
-        q: "ما هو اللون الموجود في علم عُمان؟",
-        options: ["الأحمر 🔴", "الأصفر 🟡"],
-        answer: 0
-    },
-    {
-        q: "ماذا نرفع بفخر في الاحتفالات الوطنية؟",
-        options: ["علم عُمان 🇴🇲", "كتاب 📖"],
-        answer: 0
-    },
-    {
-        q: "ماذا نشاهد يزين السماء في الاحتفالات؟",
-        options: ["الألعاب النارية 🎆", "الثلج ❄️"],
-        answer: 0
-    },
-    {
-        q: "ماذا نقول لسلطنة عُمان في عيدها الوطني؟",
-        options: ["كل عام وعُمان بخير 🇴🇲", "صباح الخير فقط ☀️"],
-        answer: 0
+    /* =========================================
+       إعدادات وحالة اللعبة
+       ========================================= */
+    let cameraX = 0;
+    let score = 0;
+    let answeredCount = 0;
+    let isPaused = false;
+    let gameFinished = false;
+
+    // إعدادات اللاعب
+    const player = {
+        x: 100, y: 300, width: 60, height: 75,
+        vx: 0, vy: 0, speed: 5, jumpPower: -13, gravity: 0.6,
+        grounded: false, facingRight: true, hidden: false
+    };
+
+    // إعدادات المنصات
+    const platforms = [
+        { x: 0, y: 420, w: 3200, h: 80 }, 
+        { x: 300, y: 320, w: 140, h: 20 },
+        { x: 550, y: 260, w: 140, h: 20 },
+        { x: 900, y: 310, w: 150, h: 20 },
+        { x: 1200, y: 250, w: 160, h: 20 },
+        { x: 1550, y: 320, w: 140, h: 20 },
+        { x: 1850, y: 270, w: 150, h: 20 },
+        { x: 2200, y: 320, w: 160, h: 20 }
+    ];
+
+    // إعدادات الأعلام المجمعة
+    let flagsList = [
+        { x: 340, y: 270, collected: false }, { x: 400, y: 370, collected: false },
+        { x: 600, y: 210, collected: false }, { x: 750, y: 370, collected: false },
+        { x: 950, y: 260, collected: false }, { x: 1250, y: 200, collected: false },
+        { x: 1400, y: 370, collected: false }, { x: 1600, y: 270, collected: false },
+        { x: 1900, y: 220, collected: false }, { x: 2250, y: 270, collected: false }
+    ];
+
+    // مواقع الأسئلة
+    let questionTriggers = [
+        { x: 500, qIndex: 0, active: true }, { x: 1000, qIndex: 1, active: true },
+        { x: 1500, qIndex: 2, active: true }, { x: 2000, qIndex: 3, active: true },
+        { x: 2500, qIndex: 4, active: true }
+    ];
+
+    // قلعة النهاية
+    const castle = { x: 2800, y: 180, w: 260, h: 240, doorX: 2900 };
+
+    /* =========================================
+       نظام الألعاب النارية
+       ========================================= */
+    let fireworks = [];
+    function createFirework(x, y) {
+        const colors = ['#d62828', '#007a3d', '#ffffff', '#ffb703', '#4cc9f0'];
+        const particleCount = 40;
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (Math.PI * 2 / particleCount) * i;
+            const speed = Math.random() * 5 + 2;
+            fireworks.push({
+                x: x, y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                alpha: 1,
+                decay: Math.random() * 0.02 + 0.015,
+                radius: Math.random() * 3 + 2
+            });
+        }
     }
-];
 
-// Audio FX (Web Audio API Synthesizer)
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(type) {
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    function updateFireworks() {
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+            let p = fireworks[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.05; // جاذبية خفيفة
+            p.alpha -= p.decay;
+            if (p.alpha <= 0) fireworks.splice(i, 1);
+        }
     }
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
 
-    if (type === 'jump') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-    } else if (type === 'collect') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
-    } else if (type === 'correct') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-    } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(140, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-    } else if (type === 'win') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.6);
-    }
-}
-
-// Game State
-let cameraX = 0;
-let score = 0;
-let answeredCount = 0;
-let isPaused = false;
-let gameFinished = false;
-
-// Player Setup
-const player = {
-    x: 100,
-    y: 300,
-    width: 60,
-    height: 75,
-    vx: 0,
-    vy: 0,
-    speed: 5,
-    jumpPower: -13,
-    gravity: 0.6,
-    grounded: false,
-    facingRight: true,
-    hidden: false
-};
-
-// Platforms Setup
-const platforms = [
-    { x: 0, y: 420, w: 3200, h: 80 }, // Ground
-    { x: 300, y: 320, w: 140, h: 20 },
-    { x: 550, y: 260, w: 140, h: 20 },
-    { x: 900, y: 310, w: 150, h: 20 },
-    { x: 1200, y: 250, w: 160, h: 20 },
-    { x: 1550, y: 320, w: 140, h: 20 },
-    { x: 1850, y: 270, w: 150, h: 20 },
-    { x: 2200, y: 320, w: 160, h: 20 }
-];
-
-// Omani Flags Collectibles
-let flagsList = [
-    { x: 340, y: 270, collected: false },
-    { x: 400, y: 370, collected: false },
-    { x: 600, y: 210, collected: false },
-    { x: 750, y: 370, collected: false },
-    { x: 950, y: 260, collected: false },
-    { x: 1250, y: 200, collected: false },
-    { x: 1400, y: 370, collected: false },
-    { x: 1600, y: 270, collected: false },
-    { x: 1900, y: 220, collected: false },
-    { x: 2250, y: 270, collected: false }
-];
-
-// Questions Points
-let questionTriggers = [
-    { x: 500, qIndex: 0, active: true },
-    { x: 1000, qIndex: 1, active: true },
-    { x: 1500, qIndex: 2, active: true },
-    { x: 2000, qIndex: 3, active: true },
-    { x: 2500, qIndex: 4, active: true }
-];
-
-// Castle End Goal
-const castle = {
-    x: 2800,
-    y: 180,
-    w: 260,
-    h: 240,
-    doorX: 2900
-};
-
-// Fireworks Particle System
-let fireworks = [];
-function createFirework(x, y) {
-    const colors = ['#d62828', '#007a3d', '#ffffff', '#ffb703', '#4cc9f0'];
-    const particleCount = 40;
-    for (let i = 0; i < particleCount; i++) {
-        const angle = (Math.PI * 2 / particleCount) * i;
-        const speed = Math.random() * 5 + 2;
-        fireworks.push({
-            x: x,
-            y: y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            alpha: 1,
-            decay: Math.random() * 0.02 + 0.015,
-            radius: Math.random() * 3 + 2
+    function drawFireworks() {
+        fireworks.forEach(p => {
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x - cameraX, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         });
     }
-}
 
-function updateFireworks() {
-    for (let i = fireworks.length - 1; i >= 0; i--) {
-        let p = fireworks[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.05; // gravity
-        p.alpha -= p.decay;
-        if (p.alpha <= 0) {
-            fireworks.splice(i, 1);
+    /* =========================================
+       نظام التحكم والإدخال
+       ========================================= */
+    const keys = { left: false, right: false, up: false };
+
+    window.addEventListener('keydown', (e) => {
+        initAudio(); // تهيئة الصوت عند أول ضغطة
+        if (e.code === 'ArrowLeft') keys.left = true;
+        if (e.code === 'ArrowRight') keys.right = true;
+        if (e.code === 'Space' || e.code === 'ArrowUp') { keys.up = true; jump(); }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (e.code === 'ArrowLeft') keys.left = false;
+        if (e.code === 'ArrowRight') keys.right = false;
+        if (e.code === 'Space' || e.code === 'ArrowUp') keys.up = false;
+    });
+
+    // أزرار اللمس
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const btnJump = document.getElementById('btn-jump');
+
+    // توجيه سهم اليسار لليسار
+    btnLeft.style.transform = 'scaleX(-1)'; 
+
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); keys.left = true; });
+    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
+    
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); keys.right = true; });
+    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
+    
+    btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); jump(); });
+
+    function jump() {
+        if (player.grounded && !isPaused && !gameFinished) {
+            player.vy = player.jumpPower;
+            player.grounded = false;
+            playSound('jump');
         }
     }
-}
 
-function drawFireworks() {
-    fireworks.forEach(p => {
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x - cameraX, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    });
-}
-
-// Input Handling
-const keys = { left: false, right: false, up: false };
-
-window.addEventListener('keydown', (e) => {
-    if (e.code === 'ArrowLeft') keys.left = true;
-    if (e.code === 'ArrowRight') keys.right = true;
-    if (e.code === 'Space' || e.code === 'ArrowUp') {
-        keys.up = true;
-        jump();
-    }
-});
-
-window.addEventListener('keyup', (e) => {
-    if (e.code === 'ArrowLeft') keys.left = false;
-    if (e.code === 'ArrowRight') keys.right = false;
-    if (e.code === 'Space' || e.code === 'ArrowUp') keys.up = false;
-});
-
-// Touch Inputs
-const btnLeft = document.getElementById('btn-left');
-const btnRight = document.getElementById('btn-right');
-const btnJump = document.getElementById('btn-jump');
-
-// Correct button orientation setup
-btnLeft.style.transform = 'scaleX(-1)'; // Left arrow pointing left
-
-btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
-btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
-btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
-btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
-btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
-
-function jump() {
-    if (player.grounded && !isPaused && !gameFinished) {
-        player.vy = player.jumpPower;
-        player.grounded = false;
-        playSound('jump');
-    }
-}
-
-// Question Trigger System
-function checkQuestionTriggers() {
-    questionTriggers.forEach(q => {
-        if (q.active && player.x >= q.x) {
-            q.active = false;
-            openQuestionModal(q.qIndex);
-        }
-    });
-}
-
-function openQuestionModal(qIndex) {
-    isPaused = true;
-    const modal = document.getElementById('question-modal');
-    const qData = questions[qIndex];
-    document.getElementById('modal-question').innerText = qData.q;
-    const optionsGrid = document.getElementById('modal-options');
-    optionsGrid.innerHTML = '';
-    document.getElementById('feedback-msg').innerText = '';
-
-    qData.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-option';
-        btn.innerText = opt;
-        btn.onclick = () => handleAnswer(idx, qData.answer);
-        optionsGrid.appendChild(btn);
-    });
-
-    modal.style.display = 'block';
-}
-
-function handleAnswer(selected, correct) {
-    const feedback = document.getElementById('feedback-msg');
-    if (selected === correct) {
-        feedback.style.color = '#007a3d';
-        feedback.innerText = '🎉 أحسنت! إجابة صحيحة!';
-        playSound('correct');
-        score += 5;
-        answeredCount++;
-        updateHUD();
-        setTimeout(() => {
-            document.getElementById('question-modal').style.display = 'none';
-            isPaused = false;
-        }, 1200);
-    } else {
-        feedback.style.color = '#d62828';
-        feedback.innerText = '😊 حاول مرة أخرى!';
-        playSound('wrong');
-    }
-}
-
-function updateHUD() {
-    document.getElementById('score-val').innerText = score;
-    document.getElementById('quest-val').innerText = `${answeredCount} / 5`;
-}
-
-// Game Loop Functions
-function update() {
-    if (isPaused) return;
-
-    // Horizonal Movement
-    if (keys.left) {
-        player.vx = -player.speed;
-        player.facingRight = false;
-    } else if (keys.right) {
-        player.vx = player.speed;
-        player.facingRight = true;
-    } else {
-        player.vx = 0;
+    /* =========================================
+       نظام الأسئلة والإجابات
+       ========================================= */
+    function checkQuestionTriggers() {
+        questionTriggers.forEach(q => {
+            if (q.active && player.x >= q.x) {
+                q.active = false;
+                openQuestionModal(q.qIndex);
+            }
+        });
     }
 
-    // Apply Gravity
-    player.vy += player.gravity;
+    function openQuestionModal(qIndex) {
+        isPaused = true;
+        player.vx = 0; // إيقاف الشخصية
+        const modal = document.getElementById('question-modal');
+        const qData = questions[qIndex];
+        
+        document.getElementById('modal-question').innerText = qData.q;
+        const optionsGrid = document.getElementById('modal-options');
+        optionsGrid.innerHTML = '';
+        document.getElementById('feedback-msg').innerText = '';
 
-    // Apply Velocity
-    player.x += player.vx;
-    player.y += player.vy;
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => handleAnswer(idx, qData.answer);
+            optionsGrid.appendChild(btn);
+        });
 
-    // Prevent moving back past left wall
-    if (player.x < 10) player.x = 10;
+        modal.style.display = 'block';
+    }
 
-    // Platform Collisions
-    player.grounded = false;
-    platforms.forEach(plat => {
-        if (player.x < plat.x + plat.w &&
-            player.x + player.width > plat.x &&
-            player.y + player.height >= plat.y &&
-            player.y + player.height <= plat.y + plat.h + player.vy) {
+    function handleAnswer(selected, correct) {
+        const feedback = document.getElementById('feedback-msg');
+        if (selected === correct) {
+            feedback.style.color = '#007a3d';
+            feedback.innerText = '🎉 أحسنت! إجابة صحيحة!';
+            playSound('correct');
+            score += 5;
+            answeredCount++;
+            updateHUD();
             
-            if (player.vy >= 0) {
-                player.grounded = true;
-                player.vy = 0;
-                player.y = plat.y - player.height;
-            }
-        }
-    });
-
-    // Auto recovery if fell below
-    if (player.y > canvas.height + 50) {
-        player.x = Math.max(100, player.x - 200);
-        player.y = 200;
-        player.vy = 0;
-    }
-
-    // Check Omani Flags Collection
-    flagsList.forEach(flag => {
-        if (!flag.collected) {
-            if (player.x < flag.x + 30 &&
-                player.x + player.width > flag.x &&
-                player.y < flag.y + 30 &&
-                player.y + player.height > flag.y) {
-                flag.collected = true;
-                score += 1;
-                updateHUD();
-                playSound('collect');
-            }
-        }
-    });
-
-    // Camera follow player
-    cameraX = player.x - canvas.width / 3;
-    if (cameraX < 0) cameraX = 0;
-
-    checkQuestionTriggers();
-
-    // Check Mario style Castle End
-    if (!gameFinished && player.x >= castle.doorX) {
-        triggerWinSequence();
-    }
-
-    if (gameFinished) {
-        updateFireworks();
-        if (Math.random() < 0.1) {
-            createFirework(
-                castle.x + Math.random() * castle.w,
-                castle.y - Math.random() * 100
-            );
-            playSound('win');
-        }
-    }
-}
-
-function triggerWinSequence() {
-    gameFinished = true;
-    player.hidden = true; // Enter castle
-    playSound('win');
-
-    // Start fireworks explosions around castle
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            createFirework(
-                castle.x + Math.random() * castle.w,
-                castle.y - Math.random() * 120
-            );
-        }, i * 300);
-    }
-
-    setTimeout(() => {
-        document.getElementById('final-flags').innerText = score - (answeredCount * 5);
-        document.getElementById('final-score').innerText = score;
-        document.getElementById('win-screen').style.display = 'block';
-    }, 2000);
-}
-
-// Drawing Functions
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 1. Draw Background Image (Tiled / Scrolling)
-    if (bgImg.complete && bgImg.naturalWidth !== 0) {
-        let bgWidth = canvas.height * (bgImg.width / bgImg.height);
-        let startTile = Math.floor(cameraX / bgWidth);
-        let endTile = Math.floor((cameraX + canvas.width) / bgWidth) + 1;
-
-        for (let i = startTile; i <= endTile; i++) {
-            ctx.drawImage(bgImg, i * bgWidth - cameraX, 0, bgWidth, canvas.height);
-        }
-    } else {
-        // Fallback Gradient
-        let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, '#a1c4fd');
-        grad.addColorStop(1, '#c2e9fb');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    ctx.save();
-    ctx.translate(-cameraX, 0);
-
-    // 2. Draw Platforms
-    platforms.forEach(p => {
-        ctx.fillStyle = '#007a3d'; // Omani Green
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.fillStyle = '#d62828'; // Omani Red Trim
-        ctx.fillRect(p.x, p.y, p.w, 5);
-    });
-
-    // 3. Draw Collectible Omani Flags 🇴🇲
-    flagsList.forEach(f => {
-        if (!f.collected) {
-            // Draw Omani Flag
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(f.x, f.y, 30, 20);
-            ctx.fillStyle = '#d62828';
-            ctx.fillRect(f.x, f.y, 10, 20);
-            ctx.fillRect(f.x + 10, f.y + 7, 20, 6);
-            ctx.fillStyle = '#007a3d';
-            ctx.fillRect(f.x + 10, f.y + 13, 20, 7);
-            // Flag Pole
-            ctx.fillStyle = '#666';
-            ctx.fillRect(f.x - 3, f.y, 3, 30);
-        }
-    });
-
-    // 4. Draw Question Points Flags/Gate
-    questionTriggers.forEach(q => {
-        if (q.active) {
-            ctx.fillStyle = '#ffb703';
-            ctx.font = '28px sans-serif';
-            ctx.fillText('❓', q.x, 380);
-        }
-    });
-
-    // 5. Draw Omani Castle at Goal (Nizwa Style Fort)
-    drawOmaniCastle(castle.x, castle.y, castle.w, castle.h);
-
-    // 6. Draw Player Character (813.png)
-    if (!player.hidden) {
-        if (charImg.complete && charImg.naturalWidth !== 0) {
-            ctx.save();
-            if (!player.facingRight) {
-                ctx.translate(player.x + player.width, player.y);
-                ctx.scale(-1, 1);
-                ctx.drawImage(charImg, 0, 0, player.width, player.height);
-            } else {
-                ctx.drawImage(charImg, player.x, player.y, player.width, player.height);
-            }
-            ctx.restore();
+            // إخفاء النافذة بعد ثانية
+            setTimeout(() => {
+                document.getElementById('question-modal').style.display = 'none';
+                isPaused = false;
+            }, 1000);
         } else {
-            // Fallback Character
-            ctx.fillStyle = '#d62828';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
+            feedback.style.color = '#d62828';
+            feedback.innerText = '😊 حاول مرة أخرى!';
+            playSound('wrong');
         }
     }
 
-    // 7. Draw Fireworks Particles
-    if (gameFinished) {
-        drawFireworks();
+    function updateHUD() {
+        document.getElementById('score-val').innerText = score;
+        document.getElementById('quest-val').innerText = `${answeredCount} / 5`;
     }
 
-    ctx.restore();
-}
+    /* =========================================
+       المنطق الرئيسي (Update)
+       ========================================= */
+    function update() {
+        if (isPaused) return;
 
-// Omani Castle Fort Drawing
-function drawOmaniCastle(x, y, w, h) {
-    // Main Structure
-    ctx.fillStyle = '#d4a373';
-    ctx.fillRect(x, y, w, h);
+        // الحركة الأفقية
+        if (!gameFinished) {
+            if (keys.left) {
+                player.vx = -player.speed;
+                player.facingRight = false;
+            } else if (keys.right) {
+                player.vx = player.speed;
+                player.facingRight = true;
+            } else {
+                player.vx = 0;
+            }
+        } else {
+            player.vx = 0; // توقف تام عند الفوز
+        }
 
-    // Battlements
-    ctx.fillStyle = '#bc6c25';
-    for (let i = 0; i < w; i += 30) {
-        ctx.fillRect(x + i, y - 15, 18, 15);
+        // تطبيق الجاذبية
+        player.vy += player.gravity;
+
+        // تطبيق السرعة على الموقع
+        player.x += player.vx;
+        player.y += player.vy;
+
+        // منع الخروج من يسار الشاشة
+        if (player.x < 10) player.x = 10;
+
+        // التصادم مع المنصات
+        player.grounded = false;
+        platforms.forEach(plat => {
+            if (player.x < plat.x + plat.w &&
+                player.x + player.width > plat.x &&
+                player.y + player.height >= plat.y &&
+                player.y + player.height <= plat.y + plat.h + player.vy) {
+                
+                if (player.vy >= 0) {
+                    player.grounded = true;
+                    player.vy = 0;
+                    player.y = plat.y - player.height;
+                }
+            }
+        });
+
+        // العودة عند السقوط
+        if (player.y > canvas.height + 50) {
+            player.x = Math.max(100, player.x - 200);
+            player.y = 200;
+            player.vy = 0;
+        }
+
+        // جمع الأعلام
+        if (!gameFinished) {
+            flagsList.forEach(flag => {
+                if (!flag.collected) {
+                    if (player.x < flag.x + 30 && player.x + player.width > flag.x &&
+                        player.y < flag.y + 30 && player.y + player.height > flag.y) {
+                        flag.collected = true;
+                        score += 1;
+                        updateHUD();
+                        playSound('collect');
+                    }
+                }
+            });
+            checkQuestionTriggers();
+        }
+
+        // تتبع الكاميرا
+        cameraX = player.x - canvas.width / 3;
+        if (cameraX < 0) cameraX = 0;
+
+        // التحقق من نهاية اللعبة (دخول القلعة)
+        if (!gameFinished && player.x >= castle.doorX) {
+            triggerWinSequence();
+        }
+
+        // تحديث الألعاب النارية
+        if (gameFinished) {
+            updateFireworks();
+            if (Math.random() < 0.08) {
+                createFirework(castle.x + Math.random() * castle.w, castle.y - Math.random() * 100);
+                playSound('win');
+            }
+        }
     }
 
-    // Main Towers
-    ctx.fillRect(x - 20, y - 30, 45, h + 30);
-    ctx.fillRect(x + w - 25, y - 30, 45, h + 30);
+    function triggerWinSequence() {
+        gameFinished = true;
+        player.hidden = true; // إخفاء اللاعب (دخول القلعة)
+        playSound('win');
 
-    // Tower battlements
-    for (let i = -20; i < 25; i += 20) {
-        ctx.fillRect(x + i, y - 45, 12, 15);
-        ctx.fillRect(x + w - 25 + (i + 20), y - 45, 12, 15);
+        // إطلاق دفعات من الألعاب النارية
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                createFirework(castle.x + Math.random() * castle.w, castle.y - Math.random() * 120);
+            }, i * 300);
+        }
+
+        // إظهار شاشة النتيجة
+        setTimeout(() => {
+            document.getElementById('final-flags').innerText = score - (answeredCount * 5);
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('win-screen').style.display = 'block';
+        }, 2000);
     }
 
-    // Arched Doorway (Mario Exit)
-    ctx.fillStyle = '#2b2d42';
-    ctx.beginPath();
-    ctx.arc(x + w / 2, y + h - 40, 30, Math.PI, 0, false);
-    ctx.rect(x + w / 2 - 30, y + h - 40, 60, 40);
-    ctx.fill();
+    /* =========================================
+       الرسم والتصيير (Draw)
+       ========================================= */
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Large Omani Flag on Castle Top
-    ctx.fillStyle = '#8d99ae';
-    ctx.fillRect(x + w / 2 - 2, y - 80, 4, 75);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x + w / 2 + 2, y - 80, 40, 25);
-    ctx.fillStyle = '#d62828';
-    ctx.fillRect(x + w / 2 + 2, y - 80, 12, 25);
-    ctx.fillRect(x + w / 2 + 14, y - 72, 28, 8);
-    ctx.fillStyle = '#007a3d';
-    ctx.fillRect(x + w / 2 + 14, y - 64, 28, 9);
-}
+        // 1. رسم الخلفية
+        if (bgImg.complete && bgImg.naturalWidth !== 0) {
+            let bgWidth = canvas.height * (bgImg.width / bgImg.height);
+            let startTile = Math.floor(cameraX / bgWidth);
+            let endTile = Math.floor((cameraX + canvas.width) / bgWidth) + 1;
 
-// Main Game Loop
-function loop() {
-    update();
-    draw();
-    requestAnimationFrame(loop);
-}
+            for (let i = startTile; i <= endTile; i++) {
+                ctx.drawImage(bgImg, i * bgWidth - cameraX, 0, bgWidth, canvas.height);
+            }
+        } else {
+            // تدرج لوني افتراضي
+            let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#a1c4fd');
+            grad.addColorStop(1, '#c2e9fb');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
-function restartGame() {
-    player.x = 100;
-    player.y = 300;
-    player.vx = 0;
-    player.vy = 0;
-    player.hidden = false;
-    score = 0;
-    answeredCount = 0;
-    gameFinished = false;
-    isPaused = false;
-    fireworks = [];
+        ctx.save();
+        ctx.translate(-cameraX, 0);
 
-    flagsList.forEach(f => f.collected = false);
-    questionTriggers.forEach(q => q.active = true);
+        // 2. رسم المنصات
+        platforms.forEach(p => {
+            ctx.fillStyle = '#007a3d'; // أخضر عُماني
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.fillStyle = '#d62828'; // أحمر عُماني
+            ctx.fillRect(p.x, p.y, p.w, 5);
+        });
 
-    updateHUD();
-    document.getElementById('win-screen').style.display = 'none';
-    document.getElementById('question-modal').style.display = 'none';
-}
+        // 3. رسم الأعلام المجمعة 🇴🇲
+        flagsList.forEach(f => {
+            if (!f.collected) {
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(f.x, f.y, 30, 20);
+                ctx.fillStyle = '#d62828'; ctx.fillRect(f.x, f.y, 10, 20);
+                ctx.fillRect(f.x + 10, f.y + 7, 20, 6);
+                ctx.fillStyle = '#007a3d'; ctx.fillRect(f.x + 10, f.y + 13, 20, 7);
+                ctx.fillStyle = '#666'; ctx.fillRect(f.x - 3, f.y, 3, 30); // سارية العلم
+            }
+        });
 
-// Start Game
-loop();
+        // 4. رسم نقاط الأسئلة
+        questionTriggers.forEach(q => {
+            if (q.active) {
+                ctx.fillStyle = '#ffb703';
+                ctx.font = '28px sans-serif';
+                ctx.fillText('❓', q.x, 380);
+            }
+        });
+
+        // 5. رسم القلعة
+        drawOmaniCastle(castle.x, castle.y, castle.w, castle.h);
+
+        // 6. رسم اللاعب
+        if (!player.hidden) {
+            if (charImg.complete && charImg.naturalWidth !== 0) {
+                ctx.save();
+                if (!player.facingRight) {
+                    ctx.translate(player.x + player.width, player.y);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(charImg, 0, 0, player.width, player.height);
+                } else {
+                    ctx.drawImage(charImg, player.x, player.y, player.width, player.height);
+                }
+                ctx.restore();
+            } else {
+                ctx.fillStyle = '#d62828';
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
+        }
+
+        // 7. رسم الألعاب النارية
+        if (gameFinished) {
+            drawFireworks();
+        }
+
+        ctx.restore();
+    }
+
+    // دالة رسم القلعة العمانية
+    function drawOmaniCastle(x, y, w, h) {
+        ctx.fillStyle = '#d4a373';
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = '#bc6c25';
+        for (let i = 0; i < w; i += 30) { ctx.fillRect(x + i, y - 15, 18, 15); }
+        ctx.fillRect(x - 20, y - 30, 45, h + 30);
+        ctx.fillRect(x + w - 25, y - 30, 45, h + 30);
+        for (let i = -20; i < 25; i += 20) {
+            ctx.fillRect(x + i, y - 45, 12, 15);
+            ctx.fillRect(x + w - 25 + (i + 20), y - 45, 12, 15);
+        }
+        ctx.fillStyle = '#2b2d42';
+        ctx.beginPath();
+        ctx.arc(x + w / 2, y + h - 40, 30, Math.PI, 0, false);
+        ctx.rect(x + w / 2 - 30, y + h - 40, 60, 40);
+        ctx.fill();
+        ctx.fillStyle = '#8d99ae'; ctx.fillRect(x + w / 2 - 2, y - 80, 4, 75);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(x + w / 2 + 2, y - 80, 40, 25);
+        ctx.fillStyle = '#d62828'; ctx.fillRect(x + w / 2 + 2, y - 80, 12, 25);
+        ctx.fillRect(x + w / 2 + 14, y - 72, 28, 8);
+        ctx.fillStyle = '#007a3d'; ctx.fillRect(x + w / 2 + 14, y - 64, 28, 9);
+    }
+
+    /* =========================================
+       دورة الحياة للعبة (Game Loop) وإعادة اللعب
+       ========================================= */
+    function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function restartGame() {
+        player.x = 100; player.y = 300; player.vx = 0; player.vy = 0;
+        player.hidden = false; player.facingRight = true;
+        score = 0; answeredCount = 0;
+        gameFinished = false; isPaused = false; fireworks = [];
+
+        flagsList.forEach(f => f.collected = false);
+        questionTriggers.forEach(q => q.active = true);
+
+        updateHUD();
+        document.getElementById('win-screen').style.display = 'none';
+        document.getElementById('question-modal').style.display = 'none';
+        
+        // إعادة تعيين حالة المفاتيح
+        keys.left = false; keys.right = false; keys.up = false;
+    }
+
+    // تشغيل اللعبة
+    loop();
 </script>
 </body>
 </html>
