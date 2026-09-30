@@ -235,7 +235,7 @@
         { x: 2500, y: 370, qIndex: 4, active: true }
     ];
 
-    const castle = { x: 2720, y: 100, w: 350, h: 320, doorX: 2880 };
+    const castle = { x: 2720, y: 80, w: 380, h: 340, doorX: 2890 };
     let fireworks = [];
 
     const keys = { left: false, right: false };
@@ -379,7 +379,7 @@
                 setTimeout(() => {
                     playSound('firework');
                     for (let f = 0; f < 35; f++) {
-                        fireworks.push({ x: castle.x + 175 + (Math.random()*120 - 60), y: castle.y + 70 + (Math.random()*100 - 50), vx: (Math.random()-0.5)*9, vy: (Math.random()-0.5)*9, color: ['#d62828','#007a3d','#f1c40f','#fff','#3498db'][Math.floor(Math.random()*5)], alpha: 1 });
+                        fireworks.push({ x: castle.x + 190 + (Math.random()*120 - 60), y: castle.y + 70 + (Math.random()*100 - 50), vx: (Math.random()-0.5)*9, vy: (Math.random()-0.5)*9, color: ['#d62828','#007a3d','#f1c40f','#fff','#3498db'][Math.floor(Math.random()*5)], alpha: 1 });
                     }
                 }, i * 450);
             }
@@ -409,31 +409,21 @@
         ctx.save();
         ctx.translate(-cameraX, 0);
 
-        // --- تصميم المنصات والأرضيات الاحترافي بأسلوب ماريو الكلاسيكي المتطور ---
         platforms.forEach(p => {
-            // جسم المنصة السفلي (نسيج حجري تراثي)
             ctx.fillStyle = '#6e4726';
             ctx.fillRect(p.x, p.y + 6, p.w, p.h - 6);
-
-            // طبقة العشب والنمو العلوي الاحترافية
             ctx.fillStyle = '#2ecc71';
             ctx.fillRect(p.x, p.y, p.w, 8);
-            
-            // حافة زخرفية علوية لإعطاء مظهر ثلاثي الأبعاد بارز
             ctx.fillStyle = '#27ae60';
             ctx.fillRect(p.x, p.y, p.w, 3);
-
-            // تفاصيل هندسية صخرية جانبية
             ctx.fillStyle = '#53351b';
             for (let i = 15; i < p.w; i += 40) {
                 ctx.fillRect(p.x + i, p.y + 10, 12, p.h - 12);
             }
         });
 
-        // --- تصميم كتل الحجارة العائمة الاحترافية ---
         stones.forEach(stone => {
             ctx.save();
-            // قاعدة الكتلة الصخرية
             ctx.fillStyle = '#7f8c8d';
             ctx.strokeStyle = '#2c3e50';
             ctx.lineWidth = 3;
@@ -441,11 +431,8 @@
             ctx.roundRect(stone.x, stone.y, stone.w, stone.h, [6, 6, 6, 6]);
             ctx.fill();
             ctx.stroke();
-
-            // تفاصيل الإطار الداخلي والنقش الحجري
             ctx.fillStyle = '#95a5a6';
             ctx.fillRect(stone.x + 6, stone.y + 6, stone.w - 12, stone.h - 12);
-
             ctx.fillStyle = '#34495e';
             ctx.fillRect(stone.x + 10, stone.y + 10, stone.w - 20, 4);
             ctx.fillRect(stone.x + 10, stone.y + stone.h - 14, stone.w - 20, 4);
@@ -482,52 +469,63 @@
             }
         });
 
+        // --- تصميم القلعة العُمانية المحسنة فائق الدقة (التعديل النهائي الأخير) ---
         ctx.save();
-        ctx.fillStyle = '#a67c52';
-        ctx.fillRect(castle.x, castle.y + 50, castle.w, castle.h - 50);
+        // القاعدة والأساس الحصين للقلعة
+        ctx.fillStyle = '#8c6239';
+        ctx.fillRect(castle.x, castle.y + 70, castle.w, castle.h - 70);
 
-        ctx.fillStyle = '#805a3b';
+        // البرج الأيمن الأسطواني التراثي الكبير
+        ctx.fillStyle = '#6d4c2b';
         ctx.beginPath();
-        ctx.arc(castle.x + 40, castle.y + 60, 50, Math.PI, 0, false);
+        ctx.arc(castle.x + 50, castle.y + 70, 55, Math.PI, 0, false);
         ctx.fill();
-        ctx.fillRect(castle.x - 10, castle.y + 60, 100, castle.h - 60);
+        ctx.fillRect(castle.x - 5, castle.y + 70, 110, castle.h - 70);
 
+        // البرج الأيسر الأسطواني التراثي الكبير
         ctx.beginPath();
-        ctx.arc(castle.x + castle.w - 40, castle.y + 60, 50, Math.PI, 0, false);
+        ctx.arc(castle.x + castle.w - 50, castle.y + 70, 55, Math.PI, 0, false);
         ctx.fill();
-        ctx.fillRect(castle.x + castle.w - 90, castle.y + 60, 100, castle.h - 60);
+        ctx.fillRect(castle.x + castle.w - 105, castle.y + 70, 110, castle.h - 70);
 
-        ctx.fillStyle = '#946b45';
-        ctx.fillRect(castle.x + 85, castle.y - 20, 180, castle.h + 20);
+        // البرج الأوسط العالي جداً (رمز القلعة الشامخة)
+        ctx.fillStyle = '#7a5431';
+        ctx.fillRect(castle.x + 95, castle.y - 30, 190, castle.h + 30);
         ctx.beginPath();
-        ctx.arc(castle.x + 175, castle.y - 20, 90, Math.PI, 0, false);
+        ctx.arc(castle.x + 190, castle.y - 30, 95, Math.PI, 0, false);
         ctx.fill();
 
-        ctx.fillStyle = '#4a3319';
-        for (let i = -10; i < castle.w + 10; i += 22) {
-            ctx.fillRect(castle.x + i, castle.y - 35, 14, 18);
+        // الشرفات الحصينة المسننة العلوية
+        ctx.fillStyle = '#3a2412';
+        for (let i = -5; i < castle.w + 5; i += 24) {
+            ctx.fillRect(castle.x + i, castle.y - 48, 16, 20);
         }
 
-        ctx.fillStyle = '#26190f';
-        ctx.fillRect(castle.x + 50, castle.y + 100, 14, 30);
-        ctx.fillRect(castle.x + 130, castle.y + 25, 14, 30);
-        ctx.fillRect(castle.x + 205, castle.y + 25, 14, 30);
-        ctx.fillRect(castle.x + castle.w - 64, castle.y + 100, 14, 30);
+        // مزاغل الدفاع والنوافذ التاريخية العمانية الضيقة
+        ctx.fillStyle = '#1a100a';
+        ctx.fillRect(castle.x + 55, castle.y + 110, 12, 35);
+        ctx.fillRect(castle.x + 140, castle.y + 30, 14, 35);
+        ctx.fillRect(castle.x + 225, castle.y + 30, 14, 35);
+        ctx.fillRect(castle.x + castle.w - 67, castle.y + 110, 12, 35);
 
-        ctx.fillStyle = '#1f120a';
+        // البوابة الخشبية التراثية المقوسة المزدوجة الكبرى
+        ctx.fillStyle = '#170d07';
         ctx.beginPath();
-        ctx.arc(castle.x + castle.w / 2, castle.y + 200, 45, Math.PI, 0, false);
+        ctx.arc(castle.x + castle.w / 2, castle.y + 210, 50, Math.PI, 0, false);
         ctx.fill();
-        ctx.fillRect(castle.x + (castle.w / 2) - 45, castle.y + 200, 90, 120);
+        ctx.fillRect(castle.x + (castle.w / 2) - 50, castle.y + 210, 100, 130);
 
-        ctx.strokeStyle = '#d4af37';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(castle.x + (castle.w / 2) - 45, castle.y + 200, 90, 120);
+        // الإطارات والزخارف الذهبية للبوابة
+        ctx.strokeStyle = '#e6c547';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(castle.x + (castle.w / 2) - 50, castle.y + 210, 100, 130);
 
-        ctx.font = '36px sans-serif';
+        // علم سلطنة عُمان الخفاق فوق قمة القلعة الشامخة
+        ctx.font = '40px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 55);
+        ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 65);
         ctx.restore();
+        // -------------------------------------------------------------
 
         if (!player.hidden) {
             ctx.save();
