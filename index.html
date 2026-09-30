@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مغامرات في بلادي 🇴🇲</title>
+    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
         body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
@@ -133,7 +133,6 @@
     let bgLoaded = false;
     bgImg.onload = () => { bgLoaded = true; };
 
-    // بنك الأسئلة مع تحديد 20 نوفمبر كإجابة صحيحة لسؤال اليوم الوطني
     const allQuestions = [
         { q: "ما عاصمة سلطنة عُمان؟", options: ["صلالة", "مسقط", "صحار", "نزوى"], answer: 1 },
         { q: "متى تحتفل سلطنة عُمان باليوم الوطني؟", options: ["18 نوفمبر", "20 نوفمبر", "23 يوليو", "11 يناير"], answer: 1 },
@@ -166,7 +165,6 @@
         { x: 2200, y: 320, w: 160, h: 20 }
     ];
 
-    // أحجار في الأرضية ليضطر اللاعب للقفز فوقها
     const stones = [
         { x: 450, y: 380, w: 40, h: 40 },
         { x: 800, y: 375, w: 45, h: 45 },
@@ -183,10 +181,13 @@
         { x: 1900, y: 220, collected: false }, { x: 2250, y: 270, collected: false }
     ];
 
+    // الأسئلة موزعة: بعضها تحت (على الطريق مباشرة) والبعض الآخر فوق (فوق المنصات ليحتاج للقفز)
     let questionTriggers = [
-        { x: 500, qIndex: 0, active: true }, { x: 1000, qIndex: 1, active: true },
-        { x: 1500, qIndex: 2, active: true }, { x: 2000, qIndex: 3, active: true },
-        { x: 2500, qIndex: 4, active: true }
+        { x: 500, y: 370, qIndex: 0, active: true }, // تحت
+        { x: 1050, y: 250, qIndex: 1, active: true }, // فوق (فوق المنصة)
+        { x: 1450, y: 370, qIndex: 2, active: true }, // تحت
+        { x: 1900, y: 200, qIndex: 3, active: true }, // فوق (فوق المنصة)
+        { x: 2500, y: 370, qIndex: 4, active: true }  // تحت
     ];
 
     const castle = { x: 2800, y: 150, w: 280, h: 270, doorX: 2910 };
@@ -276,7 +277,6 @@
 
         player.grounded = false;
         
-        // التحقق من الاصطدام بالمنصات العلوية
         platforms.forEach(plat => {
             if (player.x < plat.x + plat.w && player.x + player.width > plat.x &&
                 player.y + player.height >= plat.y && player.y + player.height <= plat.y + plat.h + player.vy) {
@@ -284,9 +284,7 @@
             }
         });
 
-        // التحقق من الاصطدام بالأحجار الأرضية (القفز فوقها أو الاصطدام الجانبي)
         stones.forEach(stone => {
-            // الهبوط فوق الحجر
             if (player.x < stone.x + stone.w && player.x + player.width > stone.x &&
                 player.y + player.height >= stone.y && player.y + player.height <= stone.y + stone.h + player.vy) {
                 if (player.vy >= 0) {
@@ -295,7 +293,6 @@
                     player.y = stone.y - player.height;
                 }
             }
-            // الاصطدام بجانب الحجر أفقياً
             if (player.y + player.height > stone.y && player.y < stone.y + stone.h) {
                 if (player.facingRight && player.x + player.width >= stone.x && player.x < stone.x) {
                     player.x = stone.x - player.width;
@@ -317,8 +314,13 @@
                 }
             });
 
+            // التحقق من تفعيل الأسئلة (سواء فوق أو تحت)
             questionTriggers.forEach(q => {
-                if (q.active && player.x >= q.x) { q.active = false; openQuestionModal(q.qIndex); }
+                if (q.active && player.x < q.x + 35 && player.x + player.width > q.x &&
+                    player.y < q.y + 40 && player.y + player.height > q.y) {
+                    q.active = false;
+                    openQuestionModal(q.qIndex);
+                }
             });
         }
 
@@ -366,7 +368,6 @@
             ctx.fillStyle = '#d62828'; ctx.fillRect(p.x, p.y, p.w, 5);
         });
 
-        // رسم الأحجار على الطريق
         stones.forEach(stone => {
             ctx.save();
             ctx.fillStyle = '#7f8c8d';
@@ -376,7 +377,6 @@
             ctx.roundRect(stone.x, stone.y, stone.w, stone.h, [8, 8, 2, 2]);
             ctx.fill();
             ctx.stroke();
-            // تفاصيل الحجر الجمالية
             ctx.fillStyle = '#95a5a6';
             ctx.fillRect(stone.x + 8, stone.y + 8, 10, 8);
             ctx.restore();
@@ -393,18 +393,22 @@
             }
         });
 
+        // شكل جديد لصناديق الأسئلة (نجمة ذهبية متألقة ⭐ للإشارة للسؤال)
         questionTriggers.forEach(q => {
             if (q.active) {
                 ctx.save();
-                ctx.fillStyle = '#ffd166';
-                ctx.fillRect(q.x - 5, 365, 45, 45);
-                ctx.strokeStyle = '#d62828';
+                ctx.beginPath();
+                ctx.arc(q.x + 18, q.y + 18, 20, 0, Math.PI * 2);
+                ctx.fillStyle = '#f1c40f';
+                ctx.fill();
                 ctx.lineWidth = 3;
-                ctx.strokeRect(q.x - 5, 365, 45, 45);
-                ctx.font = '26px sans-serif';
+                ctx.strokeStyle = '#d62828';
+                ctx.stroke();
+                
+                ctx.font = '22px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('🎁', q.x + 17, 388);
+                ctx.fillText('⭐', q.x + 18, q.y + 18);
                 ctx.restore();
             }
         });
