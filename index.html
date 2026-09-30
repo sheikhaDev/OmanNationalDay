@@ -3,29 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مغامرات في بلادي 🇴🇲</title>
+    <title>مغامرة العيد الوطني العُماني 🇴🇲</title>
+    <!-- استيراد خط عربي مخصص وجريء يناسب طابع ألعاب الفيديو الكلاسيكية -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
-        body { font-family: Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
+        body { font-family: 'Cairo', Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
         #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #000; }
         canvas { background-color: #87CEEB; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); max-width: 100%; max-height: 100%; }
+        
+        /* تحسين الخطوط والتصميم في شريط المعلومات العلوي HUD */
         #hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 10; }
-        .hud-card { background: rgba(255, 255, 255, 0.95); color: #d62828; padding: 8px 18px; border-radius: 20px; font-size: 20px; font-weight: bold; border: 2px solid #007a3d; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .hud-card { background: rgba(20, 20, 20, 0.85); color: #fff; padding: 6px 20px; border-radius: 12px; font-size: 22px; font-weight: 900; border: 3px solid #f1c40f; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-shadow: 2px 2px 0px #000; letter-spacing: 1px; }
+        .hud-card span:last-child { color: #f1c40f; }
+
         #touch-controls { position: absolute; bottom: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
         .control-group { display: flex; gap: 20px; pointer-events: auto; }
-        .btn-touch { width: 85px; height: 85px; background: rgba(255, 255, 255, 0.9); border: 4px solid #007a3d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #007a3d; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-touch { width: 85px; height: 85px; background: rgba(255, 255, 255, 0.9); border: 4px solid #007a3d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #007a3d; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: 900; }
         .btn-touch:active, .btn-touch.pressed { background: #007a3d; color: #fff; transform: scale(0.95); }
         .btn-jump { border-color: #d62828; color: #d62828; width: 95px; height: 95px; border-radius: 50%; }
         .btn-jump:active, .btn-jump.pressed { background: #d62828; color: #fff; }
-        .modal { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #fff; border: 4px solid #007a3d; border-radius: 20px; padding: 20px; text-align: center; color: #333; z-index: 20; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .modal h2 { color: #d62828; margin-bottom: 15px; }
-        .question-text { font-size: 19px; margin-bottom: 15px; font-weight: bold; }
-        .btn-option { background: #f8f9fa; border: 2px solid #007a3d; padding: 10px; border-radius: 12px; font-size: 17px; font-weight: bold; width: 100%; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
-        .btn-option:hover { background: #007a3d; color: #fff; }
-        #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #fff; border: 5px solid #d62828; border-radius: 25px; padding: 22px; text-align: center; color: #333; z-index: 30; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .win-details { background: #f8f9fa; border: 2px dashed #007a3d; padding: 12px; border-radius: 15px; margin: 15px 0; font-size: 17px; color: #333; text-align: right; display: flex; flex-direction: column; gap: 8px; }
-        .btn-restart { margin-top: 10px; background: #007a3d; color: white; border: none; padding: 12px 30px; font-size: 19px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn-restart:hover { background: #005a2d; }
+
+        /* نوافذ الأسئلة بأسلوب ألعاب الفيديو الحقيقية */
+        .modal { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #1a1a1a; border: 4px solid #f1c40f; border-radius: 20px; padding: 25px; text-align: center; color: #fff; z-index: 20; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .modal h2 { color: #f1c40f; margin-bottom: 15px; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
+        .question-text { font-size: 20px; margin-bottom: 20px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
+        .btn-option { background: #2c3e50; border: 3px solid #007a3d; color: #fff; padding: 12px; border-radius: 12px; font-size: 18px; font-weight: 900; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0px #004d26; }
+        .btn-option:hover { background: #007a3d; transform: translateY(-2px); }
+        .btn-option:active { transform: translateY(2px); box-shadow: none; }
+
+        /* شاشة الفوز النهائية */
+        #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #1a1a1a; border: 5px solid #f1c40f; border-radius: 25px; padding: 25px; text-align: center; color: #fff; z-index: 30; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
+        .win-details { background: #262626; border: 2px dashed #f1c40f; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: 18px; color: #fff; text-align: right; display: flex; flex-direction: column; gap: 10px; font-weight: 900; }
+        .btn-restart { margin-top: 10px; background: #d62828; color: white; border: 3px solid #fff; padding: 12px 35px; font-size: 20px; font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
+        .btn-restart:hover { background: #b01e1e; transform: translateY(-2px); }
+        .btn-restart:active { transform: translateY(3px); box-shadow: none; }
     </style>
 </head>
 <body>
@@ -35,7 +47,7 @@
 
     <div id="hud">
         <div class="hud-card"><span>🇴🇲 الأعلام:</span><span id="score-val">0</span></div>
-        <div class="hud-card"><span>❓ الأسئلة:</span><span id="quest-val">0 / 5</span></div>
+        <div class="hud-card"><span>⭐ الأسئلة:</span><span id="quest-val">0 / 5</span></div>
     </div>
 
     <div id="touch-controls">
@@ -52,17 +64,17 @@
         <h2>سؤال عن سلطنة عُمان 🇴🇲</h2>
         <div class="question-text" id="modal-question"></div>
         <div id="modal-options"></div>
-        <div id="feedback-msg" style="margin-top:8px; font-weight:bold;"></div>
+        <div id="feedback-msg" style="margin-top:10px; font-weight:900; font-size: 18px;"></div>
     </div>
 
     <div id="win-screen">
-        <h1 style="color:#d62828; font-size: 24px;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
-        <p style="font-size:16px; margin: 5px 0;">أكملت مغامرة العيد الوطني بنجاح!</p>
+        <h1 style="color:#f1c40f; font-size: 26px; font-weight:900; text-shadow: 2px 2px #d62828;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
+        <p style="font-size:16px; margin: 8px 0; font-weight:700;">أكملت مغامرة العيد الوطني بنجاح!</p>
         
         <div class="win-details">
-            <div>✅ <strong>الأسئلة الصحيحة:</strong> <span id="final-questions">0</span> من 5</div>
-            <div>🇴🇲 <strong>الأعلام المجمعة:</strong> <span id="final-flags">0</span> من 10</div>
-            <div style="color:#007a3d; font-weight:bold; border-top: 1px solid #ddd; padding-top: 5px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
+            <div>✅ <strong>الأسئلة الصحيحة:</strong> <span id="final-questions" style="color:#f1c40f;">0</span> من 5</div>
+            <div>🇴🇲 <strong>الأعلام المجمعة:</strong> <span id="final-flags" style="color:#f1c40f;">0</span> من 10</div>
+            <div style="color:#2ecc71; font-weight:900; border-top: 1px dashed #555; padding-top: 8px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
         </div>
 
         <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
@@ -136,22 +148,21 @@
                 noise.start(now);
                 noise.stop(now + 0.4);
             } else if (type === 'mario-win') {
-                // نغمات الفوز الشهيرة للعبة ماريو (Classic Mario Level Clear Fanfare)
                 let notes = [
-                    { freq: 659.25, time: 0.0, dur: 0.15 }, // E5
-                    { freq: 659.25, time: 0.15, dur: 0.15 }, // E5
-                    { freq: 659.25, time: 0.35, dur: 0.15 }, // E5
-                    { freq: 523.25, time: 0.55, dur: 0.15 }, // C5
-                    { freq: 659.25, time: 0.75, dur: 0.15 }, // E5
-                    { freq: 783.99, time: 0.95, dur: 0.3 },  // G5
-                    { freq: 392.00, time: 1.35, dur: 0.3 }   // G4
+                    { freq: 659.25, time: 0.0, dur: 0.15 },
+                    { freq: 659.25, time: 0.15, dur: 0.15 },
+                    { freq: 659.25, time: 0.35, dur: 0.15 },
+                    { freq: 523.25, time: 0.55, dur: 0.15 },
+                    { freq: 659.25, time: 0.75, dur: 0.15 },
+                    { freq: 783.99, time: 0.95, dur: 0.3 },
+                    { freq: 392.00, time: 1.35, dur: 0.3 }
                 ];
                 notes.forEach(n => {
                     let o = audioCtx.createOscillator();
                     let g = audioCtx.createGain();
                     o.connect(g);
                     g.connect(audioCtx.destination);
-                    o.type = 'square'; // استخدام موجة مربعة لإعطاء الطابع الكلاسيكي القديم لألعاب الـ Retro
+                    o.type = 'square';
                     o.frequency.setValueAtTime(n.freq, now + n.time);
                     g.gain.setValueAtTime(0.15, now + n.time);
                     g.gain.linearRampToValueAtTime(0.01, now + n.time + n.dur);
@@ -228,7 +239,6 @@
         { x: 2500, y: 370, qIndex: 4, active: true }
     ];
 
-    // القلعة الحصينة بتصميم تراثي عُماني راقٍ
     const castle = { x: 2720, y: 100, w: 350, h: 320, doorX: 2880 };
     let fireworks = [];
 
@@ -282,7 +292,7 @@
             btn.onclick = () => {
                 if (idx === qData.answer) {
                     playSound('flag');
-                    document.getElementById('feedback-msg').style.color = '#007a3d';
+                    document.getElementById('feedback-msg').style.color = '#2ecc71';
                     document.getElementById('feedback-msg').innerText = '🎉 أحسنت! إجابة صحيحة!';
                     score += 5; answeredCount++;
                     document.getElementById('score-val').innerText = score;
@@ -292,7 +302,7 @@
                         isPaused = false;
                     }, 1000);
                 } else {
-                    document.getElementById('feedback-msg').style.color = '#d62828';
+                    document.getElementById('feedback-msg').style.color = '#e74c3c';
                     document.getElementById('feedback-msg').innerText = '😊 حاول مرة أخرى!';
                 }
             };
@@ -367,7 +377,7 @@
 
         if (!gameFinished && player.x >= castle.doorX) {
             gameFinished = true; player.hidden = true;
-            playSound('mario-win'); // تشغيل صوت فوز ماريو الشهير عند الوصول للنهاية
+            playSound('mario-win');
             
             for (let i = 0; i < 7; i++) {
                 setTimeout(() => {
@@ -452,13 +462,10 @@
             }
         });
 
-        // --- تصميم القلعة العُمانية المحسنة والمطورة بدقة إبداعية عالية ---
         ctx.save();
-        // الحصن والأبراج الجانبية المهيبة
         ctx.fillStyle = '#a67c52';
         ctx.fillRect(castle.x, castle.y + 50, castle.w, castle.h - 50);
 
-        // البرج الأيمن والأيسر الأسطواني التراثي
         ctx.fillStyle = '#805a3b';
         ctx.beginPath();
         ctx.arc(castle.x + 40, castle.y + 60, 50, Math.PI, 0, false);
@@ -470,44 +477,37 @@
         ctx.fill();
         ctx.fillRect(castle.x + castle.w - 90, castle.y + 60, 100, castle.h - 60);
 
-        // البرج الأوسط العالي (نصب الحصن)
         ctx.fillStyle = '#946b45';
         ctx.fillRect(castle.x + 85, castle.y - 20, 180, castle.h + 20);
         ctx.beginPath();
         ctx.arc(castle.x + 175, castle.y - 20, 90, Math.PI, 0, false);
         ctx.fill();
 
-        // الشرفات والأسوار المسننة العلوية
         ctx.fillStyle = '#4a3319';
         for (let i = -10; i < castle.w + 10; i += 22) {
             ctx.fillRect(castle.x + i, castle.y - 35, 14, 18);
         }
 
-        // النوافذ الدفاعية والمزاغل التراثية
         ctx.fillStyle = '#26190f';
         ctx.fillRect(castle.x + 50, castle.y + 100, 14, 30);
         ctx.fillRect(castle.x + 130, castle.y + 25, 14, 30);
         ctx.fillRect(castle.x + 205, castle.y + 25, 14, 30);
         ctx.fillRect(castle.x + castle.w - 64, castle.y + 100, 14, 30);
 
-        // البوابة الرئيسية الخشبية المقوسة المزدوجة المزخرفة
         ctx.fillStyle = '#1f120a';
         ctx.beginPath();
         ctx.arc(castle.x + castle.w / 2, castle.y + 200, 45, Math.PI, 0, false);
         ctx.fill();
         ctx.fillRect(castle.x + (castle.w / 2) - 45, castle.y + 200, 90, 120);
 
-        // الإطارات الذهبية للأبواب والزخرفة
         ctx.strokeStyle = '#d4af37';
         ctx.lineWidth = 4;
         ctx.strokeRect(castle.x + (castle.w / 2) - 45, castle.y + 200, 90, 120);
 
-        // راية سلطنة عُمان الخفاقة فوق القمة
         ctx.font = '36px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 55);
         ctx.restore();
-        // -------------------------------------------------------------
 
         if (!player.hidden) {
             ctx.save();
