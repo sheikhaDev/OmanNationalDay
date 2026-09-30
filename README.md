@@ -1,6 +1,6 @@
 # OmanNationalDay
 
-html
+<html>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -904,4 +904,3 @@ html
 </body>
 </html>
 
-```
