@@ -7,10 +7,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Cairo', Tahoma, sans-serif; background-color: #0d0d0d; color: #fff; overflow: hidden; touch-action: none; direction: rtl; width: 100vw; height: 100vh; }
+        
+        /* جعل الصفحة متجاوبة تماماً لتملأ الشاشة بدون أي إزاحة أو مشاكل عرض */
+        body, html { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: #0b0b0b; 
+            font-family: 'Cairo', Tahoma, sans-serif; 
+            touch-action: none;
+            position: fixed;
+        }
         
         #game-container { 
-            position: relative; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
             width: 100%; 
             height: 100%; 
             display: flex; 
@@ -20,137 +32,141 @@
             overflow: hidden;
         }
 
+        /* تحجيم الكانفاس بذكاء ليناسب كل الشاشات مع الحفاظ على الأبعاد الصحيحة */
         canvas { 
             background-color: #87CEEB; 
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.9); 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); 
             width: 100%; 
             height: 100%; 
-            object-fit: contain; 
+            object-fit: cover; 
             display: block;
         }
         
-        /* شريط المعلومات العلوي */
+        /* شريط المعلومات العلوي بتصميم أنيق ومتجاوب */
         #hud { 
             position: absolute; 
-            top: 2vh; 
-            left: 3vw; 
-            right: 3vw; 
+            top: max(15px, 2vh); 
+            left: 4vw; 
+            right: 4vw; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             pointer-events: none; 
-            z-index: 10; 
+            z-index: 15; 
         }
         .hud-card { 
-            background: rgba(20, 20, 20, 0.9); 
+            background: rgba(15, 15, 15, 0.85); 
+            backdrop-filter: blur(5px);
             color: #fff; 
-            padding: 8px 18px; 
-            border-radius: 14px; 
-            font-size: clamp(14px, 3.5vw, 22px); 
+            padding: 8px 16px; 
+            border-radius: 16px; 
+            font-size: clamp(13px, 3.5vw, 20px); 
             font-weight: 900; 
-            border: 3px solid #f1c40f; 
+            border: 2px solid #f1c40f; 
             display: flex; 
             align-items: center; 
-            gap: 10px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6); 
-            text-shadow: 2px 2px 0px #000; 
+            gap: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+            text-shadow: 1px 1px 2px #000; 
         }
         .hud-card span:last-child { color: #f1c40f; }
 
-        /* أزرار التحكم باللمس العصرية */
+        /* أزرار التحكم باللمس الموزعة بشكل مريح لجميع الأجهزة */
         #touch-controls { 
             position: absolute; 
-            bottom: 2.5vh; 
+            bottom: max(20px, 3vh); 
             left: 4vw; 
             right: 4vw; 
             display: flex; 
             justify-content: space-between; 
             align-items: flex-end;
-            z-index: 10; 
+            z-index: 15; 
             pointer-events: none; 
         }
-        .control-group { display: flex; gap: 15px; pointer-events: auto; }
+        .control-group { display: flex; gap: 14px; pointer-events: auto; }
         
         .btn-touch { 
-            width: clamp(65px, 14vw, 85px); 
-            height: clamp(65px, 14vw, 85px); 
-            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(230,230,230,0.85)); 
-            border: 4px solid #007a3d; 
+            width: clamp(60px, 13vw, 80px); 
+            height: clamp(60px, 13vw, 80px); 
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(220,220,220,0.85)); 
+            border: 3px solid #007a3d; 
             border-radius: 50%; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: clamp(26px, 5.5vw, 36px); 
+            font-size: clamp(24px, 5vw, 34px); 
             color: #007a3d; 
             cursor: pointer; 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.8); 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.9); 
             font-weight: 900; 
-            transition: transform 0.1s ease, background 0.1s ease;
+            transition: transform 0.08s ease, background 0.08s ease;
         }
         .btn-touch:active, .btn-touch.pressed { 
-            background: linear-gradient(135deg, #007a3d, #005a2d); 
+            background: linear-gradient(135deg, #007a3d, #004d26); 
             color: #fff; 
             border-color: #fff;
-            transform: scale(0.92); 
+            transform: scale(0.90); 
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
 
         .btn-jump { 
             border-color: #d62828; 
             color: #d62828; 
-            width: clamp(75px, 16vw, 95px); 
-            height: clamp(75px, 16vw, 95px); 
+            width: clamp(68px, 15vw, 90px); 
+            height: clamp(68px, 15vw, 90px); 
         }
         .btn-jump:active, .btn-jump.pressed { 
-            background: linear-gradient(135deg, #d62828, #a81d1d); 
+            background: linear-gradient(135deg, #d62828, #991c1c); 
             color: #fff; 
             border-color: #fff;
         }
 
-        /* نافذة الأسئلة */
+        /* نافذة الأسئلة المتجاوبة بتصميم رائع وعصري */
         .modal { 
             position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
-            width: 90%; 
-            max-width: 460px; 
-            background: #1a1a1a; 
+            width: 92%; 
+            max-width: 440px; 
+            background: rgba(26, 26, 26, 0.95); 
+            backdrop-filter: blur(10px);
             border: 4px solid #f1c40f; 
-            border-radius: 22px; 
-            padding: 22px; 
+            border-radius: 20px; 
+            padding: 20px; 
             text-align: center; 
             color: #fff; 
-            z-index: 20; 
+            z-index: 25; 
             display: none; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
         }
-        .modal h2 { color: #f1c40f; margin-bottom: 12px; font-size: clamp(20px, 5vw, 25px); font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
-        .question-text { font-size: clamp(16px, 4vw, 20px); margin-bottom: 18px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
-        .btn-option { background: #2c3e50; border: 3px solid #007a3d; color: #fff; padding: 12px; border-radius: 12px; font-size: clamp(14px, 3.8vw, 18px); font-weight: 900; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0px #004d26; }
+        .modal h2 { color: #f1c40f; margin-bottom: 10px; font-size: clamp(18px, 4.5vw, 24px); font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
+        .question-text { font-size: clamp(15px, 3.8vw, 19px); margin-bottom: 15px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
+        .btn-option { background: #2c3e50; border: 3px solid #007a3d; color: #fff; padding: 11px; border-radius: 12px; font-size: clamp(13px, 3.5vw, 17px); font-weight: 900; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0px #004d26; }
         .btn-option:hover { background: #007a3d; transform: translateY(-2px); }
         .btn-option:active { transform: translateY(2px); box-shadow: none; }
 
-        /* شاشة الفوز */
+        /* شاشة الفوز والنهاية المتجاوبة */
         #win-screen { 
             position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
-            width: 90%; 
-            max-width: 460px; 
-            background: #1a1a1a; 
+            width: 92%; 
+            max-width: 440px; 
+            background: rgba(26, 26, 26, 0.96); 
+            backdrop-filter: blur(10px);
             border: 5px solid #f1c40f; 
-            border-radius: 25px; 
-            padding: 22px; 
+            border-radius: 22px; 
+            padding: 20px; 
             text-align: center; 
             color: #fff; 
-            z-index: 30; 
+            z-index: 35; 
             display: none; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.95); 
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95); 
         }
-        .win-details { background: #262626; border: 2px dashed #f1c40f; padding: 14px; border-radius: 16px; margin: 14px 0; font-size: clamp(14px, 3.6vw, 18px); color: #fff; text-align: right; display: flex; flex-direction: column; gap: 8px; font-weight: 900; }
-        .btn-restart { margin-top: 8px; background: #d62828; color: white; border: 3px solid #fff; padding: 12px 35px; font-size: clamp(16px, 4vw, 20px); font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
+        .win-details { background: rgba(38, 38, 38, 0.9); border: 2px dashed #f1c40f; padding: 12px; border-radius: 14px; margin: 12px 0; font-size: clamp(13px, 3.4vw, 17px); color: #fff; text-align: right; display: flex; flex-direction: column; gap: 6px; font-weight: 900; }
+        .btn-restart { margin-top: 6px; background: #d62828; color: white; border: 3px solid #fff; padding: 10px 30px; font-size: clamp(15px, 3.8vw, 19px); font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
         .btn-restart:hover { background: #b01e1e; transform: translateY(-2px); }
         .btn-restart:active { transform: translateY(3px); box-shadow: none; }
     </style>
@@ -165,7 +181,7 @@
         <div class="hud-card"><span>⭐ الأسئلة:</span><span id="quest-val">0 / 5</span></div>
     </div>
 
-    <!-- تحسين أشكال الأيقونات والأسهم لتكون أكثر جمالاً وعصرية -->
+    <!-- أزرار تحكم محسنة وواضحة لجميع أحجام الشاشات -->
     <div id="touch-controls">
         <div class="control-group">
             <div class="btn-touch" id="btn-left">◀</div>
@@ -177,20 +193,20 @@
     </div>
 
     <div class="modal" id="question-modal">
-        <h2>سؤال 🇴🇲</h2>
+        <h2>سؤال وطني 🇴🇲</h2>
         <div class="question-text" id="modal-question"></div>
         <div id="modal-options"></div>
-        <div id="feedback-msg" style="margin-top:8px; font-weight:900; font-size: 16px;"></div>
+        <div id="feedback-msg" style="margin-top:6px; font-weight:900; font-size: 15px;"></div>
     </div>
 
     <div id="win-screen">
-        <h1 style="color:#f1c40f; font-size: clamp(20px, 5vw, 26px); font-weight:900; text-shadow: 2px 2px #d62828;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
-        <p style="font-size:clamp(14px, 3.5vw, 16px); margin: 6px 0; font-weight:700;">أكملت مغامرة العيد الوطني بنجاح!</p>
+        <h1 style="color:#f1c40f; font-size: clamp(18px, 4.5vw, 24px); font-weight:900; text-shadow: 2px 2px #d62828;">🎉 أحسنت يا بطل عُمان! 🇴🇲</h1>
+        <p style="font-size:clamp(13px, 3.3vw, 15px); margin: 6px 0; font-weight:700;">أكملت مغامرة العيد الوطني بنجاح تام!</p>
         
         <div class="win-details">
             <div>✅ <strong>الأسئلة الصحيحة:</strong> <span id="final-questions" style="color:#f1c40f;">0</span> من 5</div>
             <div>🇴🇲 <strong>الأعلام المجمعة:</strong> <span id="final-flags" style="color:#f1c40f;">0</span> من 10</div>
-            <div style="color:#2ecc71; font-weight:900; border-top: 1px dashed #555; padding-top: 6px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
+            <div style="color:#2ecc71; font-weight:900; border-top: 1px dashed #555; padding-top: 5px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
         </div>
 
         <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
@@ -379,7 +395,7 @@
         el.addEventListener('pointerleave', (e) => { e.preventDefault(); el.classList.remove('pressed'); actionRelease(); });
     }
 
-    // لأننا نستخدم اتجاه RTL، الأيقونة "◀" تعبر عن اليسار و "▶" تعبر عن اليمين برمجياً
+    // ربط الأسهم بشكل متوافق مع نظام الاتجاهات (RTL)
     bindButton('btn-left', () => { keys.right = true; }, () => { keys.right = false; });
     bindButton('btn-right', () => { keys.left = true; }, () => { keys.left = false; });
     bindButton('btn-jump', () => { jump(); }, () => {});
@@ -633,7 +649,7 @@
         ctx.strokeRect(castle.x + (castle.w / 2) - 50, castle.y + 210, 100, 130);
 
         ctx.font = '40px sans-serif';
-        ctx.textAlign, ctx.textAlign = 'center';
+        ctx.textAlign = 'center';
         ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 65);
         ctx.restore();
 
