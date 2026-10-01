@@ -7,31 +7,132 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
-        body { font-family: 'Cairo', Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; }
-        #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #000; }
-        canvas { background-color: #87CEEB; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); max-width: 100%; max-height: 100%; }
+        body { font-family: 'Cairo', Tahoma, sans-serif; background-color: #111; color: #fff; overflow: hidden; touch-action: none; direction: rtl; width: 100vw; height: 100vh; }
         
-        #hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 10; }
-        .hud-card { background: rgba(20, 20, 20, 0.85); color: #fff; padding: 6px 20px; border-radius: 12px; font-size: 22px; font-weight: 900; border: 3px solid #f1c40f; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-shadow: 2px 2px 0px #000; letter-spacing: 1px; }
+        #game-container { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: #000; 
+            overflow: hidden;
+        }
+
+        canvas { 
+            background-color: #87CEEB; 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            display: block;
+        }
+        
+        #hud { 
+            position: absolute; 
+            top: 15px; 
+            left: 20px; 
+            right: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            pointer-events: none; 
+            z-index: 10; 
+        }
+        .hud-card { 
+            background: rgba(20, 20, 20, 0.85); 
+            color: #fff; 
+            padding: 5px 15px; 
+            border-radius: 12px; 
+            font-size: clamp(14px, 4vw, 22px); 
+            font-weight: 900; 
+            border: 3px solid #f1c40f; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            text-shadow: 2px 2px 0px #000; 
+        }
         .hud-card span:last-child { color: #f1c40f; }
 
-        #touch-controls { position: absolute; bottom: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
-        .control-group { display: flex; gap: 20px; pointer-events: auto; }
-        .btn-touch { width: 85px; height: 85px; background: rgba(255, 255, 255, 0.9); border: 4px solid #007a3d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #007a3d; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: 900; }
+        #touch-controls { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            right: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 10; 
+            pointer-events: none; 
+        }
+        .control-group { display: flex; gap: 15px; pointer-events: auto; }
+        .btn-touch { 
+            width: clamp(65px, 15vw, 85px); 
+            height: clamp(65px, 15vw, 85px); 
+            background: rgba(255, 255, 255, 0.9); 
+            border: 4px solid #007a3d; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: clamp(25px, 6vw, 35px); 
+            color: #007a3d; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            font-weight: 900; 
+        }
         .btn-touch:active, .btn-touch.pressed { background: #007a3d; color: #fff; transform: scale(0.95); }
-        .btn-jump { border-color: #d62828; color: #d62828; width: 95px; height: 95px; border-radius: 50%; }
+        .btn-jump { 
+            border-color: #d62828; 
+            color: #d62828; 
+            width: clamp(75px, 18vw, 95px); 
+            height: clamp(75px, 18vw, 95px); 
+        }
         .btn-jump:active, .btn-jump.pressed { background: #d62828; color: #fff; }
 
-        .modal { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #1a1a1a; border: 4px solid #f1c40f; border-radius: 20px; padding: 25px; text-align: center; color: #fff; z-index: 20; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .modal h2 { color: #f1c40f; margin-bottom: 15px; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
-        .question-text { font-size: 20px; margin-bottom: 20px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
-        .btn-option { background: #2c3e50; border: 3px solid #007a3d; color: #fff; padding: 12px; border-radius: 12px; font-size: 18px; font-weight: 900; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0px #004d26; }
+        .modal { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 90%; 
+            max-width: 480px; 
+            background: #1a1a1a; 
+            border: 4px solid #f1c40f; 
+            border-radius: 20px; 
+            padding: 20px; 
+            text-align: center; 
+            color: #fff; 
+            z-index: 20; 
+            display: none; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+        }
+        .modal h2 { color: #f1c40f; margin-bottom: 12px; font-size: clamp(18px, 5vw, 24px); font-weight: 900; text-shadow: 2px 2px 0px #d62828; }
+        .question-text { font-size: clamp(16px, 4vw, 20px); margin-bottom: 15px; font-weight: 900; color: #fff; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
+        .btn-option { background: #2c3e50; border: 3px solid #007a3d; color: #fff; padding: 10px; border-radius: 12px; font-size: clamp(14px, 4vw, 18px); font-weight: 900; width: 100%; margin-bottom: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0px #004d26; }
         .btn-option:hover { background: #007a3d; transform: translateY(-2px); }
         .btn-option:active { transform: translateY(2px); box-shadow: none; }
 
-        #win-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 480px; background: #1a1a1a; border: 5px solid #f1c40f; border-radius: 25px; padding: 25px; text-align: center; color: #fff; z-index: 30; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
-        .win-details { background: #262626; border: 2px dashed #f1c40f; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: 18px; color: #fff; text-align: right; display: flex; flex-direction: column; gap: 10px; font-weight: 900; }
-        .btn-restart { margin-top: 10px; background: #d62828; color: white; border: 3px solid #fff; padding: 12px 35px; font-size: 20px; font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
+        #win-screen { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 90%; 
+            max-width: 460px; 
+            background: #1a1a1a; 
+            border: 5px solid #f1c40f; 
+            border-radius: 25px; 
+            padding: 20px; 
+            text-align: center; 
+            color: #fff; 
+            z-index: 30; 
+            display: none; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9); 
+        }
+        .win-details { background: #262626; border: 2px dashed #f1c40f; padding: 12px; border-radius: 15px; margin: 12px 0; font-size: clamp(14px, 3.5vw, 18px); color: #fff; text-align: right; display: flex; flex-direction: column; gap: 8px; font-weight: 900; }
+        .btn-restart { margin-top: 5px; background: #d62828; color: white; border: 3px solid #fff; padding: 10px 30px; font-size: clamp(16px, 4vw, 20px); font-weight: 900; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 0px #801515; transition: 0.1s; }
         .btn-restart:hover { background: #b01e1e; transform: translateY(-2px); }
         .btn-restart:active { transform: translateY(3px); box-shadow: none; }
     </style>
@@ -57,20 +158,20 @@
     </div>
 
     <div class="modal" id="question-modal">
-        <h2>سؤال  🇴🇲</h2>
+        <h2>سؤال 🇴🇲</h2>
         <div class="question-text" id="modal-question"></div>
         <div id="modal-options"></div>
-        <div id="feedback-msg" style="margin-top:10px; font-weight:900; font-size: 18px;"></div>
+        <div id="feedback-msg" style="margin-top:8px; font-weight:900; font-size: 16px;"></div>
     </div>
 
     <div id="win-screen">
-        <h1 style="color:#f1c40f; font-size: 26px; font-weight:900; text-shadow: 2px 2px #d62828;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
-        <p style="font-size:16px; margin: 8px 0; font-weight:700;">أكملت مغامرة العيد الوطني بنجاح!</p>
+        <h1 style="color:#f1c40f; font-size: clamp(20px, 5vw, 26px); font-weight:900; text-shadow: 2px 2px #d62828;">🎉 أحسنت بطل عُمان! 🇴🇲</h1>
+        <p style="font-size:clamp(14px, 3.5vw, 16px); margin: 6px 0; font-weight:700;">أكملت مغامرة العيد الوطني بنجاح!</p>
         
         <div class="win-details">
             <div>✅ <strong>الأسئلة الصحيحة:</strong> <span id="final-questions" style="color:#f1c40f;">0</span> من 5</div>
             <div>🇴🇲 <strong>الأعلام المجمعة:</strong> <span id="final-flags" style="color:#f1c40f;">0</span> من 10</div>
-            <div style="color:#2ecc71; font-weight:900; border-top: 1px dashed #555; padding-top: 8px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
+            <div style="color:#2ecc71; font-weight:900; border-top: 1px dashed #555; padding-top: 6px; margin-top: 2px;">⭐ <strong>المجموع الكلي:</strong> <span id="final-score">0</span> نقطة</div>
         </div>
 
         <button class="btn-restart" onclick="restartGame()">🔄 العب مرة أخرى</button>
@@ -469,63 +570,52 @@
             }
         });
 
-        // --- تصميم القلعة العُمانية المحسنة فائق الدقة (التعديل النهائي الأخير) ---
         ctx.save();
-        // القاعدة والأساس الحصين للقلعة
         ctx.fillStyle = '#8c6239';
         ctx.fillRect(castle.x, castle.y + 70, castle.w, castle.h - 70);
 
-        // البرج الأيمن الأسطواني التراثي الكبير
         ctx.fillStyle = '#6d4c2b';
         ctx.beginPath();
         ctx.arc(castle.x + 50, castle.y + 70, 55, Math.PI, 0, false);
         ctx.fill();
         ctx.fillRect(castle.x - 5, castle.y + 70, 110, castle.h - 70);
 
-        // البرج الأيسر الأسطواني التراثي الكبير
         ctx.beginPath();
         ctx.arc(castle.x + castle.w - 50, castle.y + 70, 55, Math.PI, 0, false);
         ctx.fill();
         ctx.fillRect(castle.x + castle.w - 105, castle.y + 70, 110, castle.h - 70);
 
-        // البرج الأوسط العالي جداً (رمز القلعة الشامخة)
         ctx.fillStyle = '#7a5431';
         ctx.fillRect(castle.x + 95, castle.y - 30, 190, castle.h + 30);
         ctx.beginPath();
         ctx.arc(castle.x + 190, castle.y - 30, 95, Math.PI, 0, false);
         ctx.fill();
 
-        // الشرفات الحصينة المسننة العلوية
         ctx.fillStyle = '#3a2412';
         for (let i = -5; i < castle.w + 5; i += 24) {
             ctx.fillRect(castle.x + i, castle.y - 48, 16, 20);
         }
 
-        // مزاغل الدفاع والنوافذ التاريخية العمانية الضيقة
         ctx.fillStyle = '#1a100a';
         ctx.fillRect(castle.x + 55, castle.y + 110, 12, 35);
         ctx.fillRect(castle.x + 140, castle.y + 30, 14, 35);
         ctx.fillRect(castle.x + 225, castle.y + 30, 14, 35);
         ctx.fillRect(castle.x + castle.w - 67, castle.y + 110, 12, 35);
 
-        // البوابة الخشبية التراثية المقوسة المزدوجة الكبرى
         ctx.fillStyle = '#170d07';
         ctx.beginPath();
         ctx.arc(castle.x + castle.w / 2, castle.y + 210, 50, Math.PI, 0, false);
         ctx.fill();
         ctx.fillRect(castle.x + (castle.w / 2) - 50, castle.y + 210, 100, 130);
 
-        // الإطارات والزخارف الذهبية للبوابة
         ctx.strokeStyle = '#e6c547';
         ctx.lineWidth = 5;
         ctx.strokeRect(castle.x + (castle.w / 2) - 50, castle.y + 210, 100, 130);
 
-        // علم سلطنة عُمان الخفاق فوق قمة القلعة الشامخة
         ctx.font = '40px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('🇴🇲', castle.x + castle.w / 2, castle.y - 65);
         ctx.restore();
-        // -------------------------------------------------------------
 
         if (!player.hidden) {
             ctx.save();
